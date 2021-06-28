@@ -228,7 +228,6 @@ function RTLPage() {
                 tabIcon: BugReport,
                 tabContent: (
                   <Tasks
-                    checkedIndexes={[0, 3]}
                     tasksIndexes={[0, 1, 2, 3]}
                     tasks={bugs}
                     rtlActive
@@ -240,7 +239,6 @@ function RTLPage() {
                 tabIcon: Code,
                 tabContent: (
                   <Tasks
-                    checkedIndexes={[0]}
                     tasksIndexes={[0, 1]}
                     tasks={website}
                     rtlActive
@@ -252,7 +250,6 @@ function RTLPage() {
                 tabIcon: Cloud,
                 tabContent: (
                   <Tasks
-                    checkedIndexes={[1]}
                     tasksIndexes={[0, 1, 2]}
                     tasks={server}
                     rtlActive
