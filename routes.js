@@ -33,7 +33,6 @@ const dashboardRoutes = [
   {
     path: "/dashboard",
     name: "Dashboard",
-    rtlName: "لوحة القيادة",
     icon: Dashboard,
 
     layout: "/admin",
@@ -41,7 +40,6 @@ const dashboardRoutes = [
   {
     path: "/table-list",
     name: "Activity Logs",
-    rtlName: "قائمة الجدول",
     icon: HistoryIcon,
 
     layout: "/admin",
@@ -49,7 +47,6 @@ const dashboardRoutes = [
   {
     path: "/user-profile",
     name: "User Profile",
-    rtlName: "ملف تعريفي للمستخدم",
     icon: Person,
 
     layout: "/admin",
@@ -57,7 +54,6 @@ const dashboardRoutes = [
   {
     path: "/employee-list",
     name: "Employee List",
-    rtlName: "قائمة الجدول",
     icon: GroupIcon,
 
     layout: "/admin",
@@ -65,7 +61,6 @@ const dashboardRoutes = [
   {
     path: "/typography",
     name: "Typography",
-    rtlName: "طباعة",
     icon: LibraryBooks,
 
     layout: "/admin",
@@ -73,7 +68,6 @@ const dashboardRoutes = [
   {
     path: "/icons",
     name: "Icons",
-    rtlName: "الرموز",
     icon: BubbleChart,
 
     layout: "/admin",
@@ -81,7 +75,6 @@ const dashboardRoutes = [
   {
     path: "/notifications",
     name: "Notifications",
-    rtlName: "إخطارات",
     icon: Notifications,
 
     layout: "/admin",
@@ -89,14 +82,12 @@ const dashboardRoutes = [
   {
     path: "/inbound",
     name: "Inbound Documents",
-    rtlName: "ملف تعريفي للمستخدم",
     icon: AssignmentReturnedRoundedIcon,
     layout: "/admin",
   },
   {
     path: "/outbound",
     name: "Outbound Documents",
-    rtlName: "ملف تعريفي للمستخدم",
     icon: ExitToAppTwoToneIcon,
     layout: "/admin",
   },

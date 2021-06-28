@@ -14,7 +14,6 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardAvatar from "components/Card/CardAvatar.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
-import Chip from '@material-ui/core/Chip';
 
 import avatar from "assets/img/faces/marc.jpg";
 
@@ -233,7 +232,6 @@ function UserProfile() {
         </GridItem>
         <GridItem xs={12} sm={12} md={4}>
           <Card profile>
-          <Chip color="primary" label="OUT"/>
             <CardAvatar profile>
               <a href="#pablo" onClick={(e) => e.preventDefault()}>
                 <img src={avatar} alt="..." />
