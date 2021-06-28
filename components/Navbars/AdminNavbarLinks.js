@@ -72,7 +72,7 @@ export default function AdminNavbarLinks(props) {
           <Search />
         </Button>
       </div> */}
-      <Link href={"/admin/dashboard"}>
+      {/* <Link href={"/admin/dashboard"}>
         <Button
           color={size.width > 959 ? "transparent" : "white"}
           justIcon={size.width > 959}
@@ -85,7 +85,7 @@ export default function AdminNavbarLinks(props) {
             <p className={classes.linkText}>Dashboard</p>
           </Hidden>
         </Button>
-      </Link>
+      </Link> */}
       <div className={classes.manager}>
         <Button
           color={size.width > 959 ? "transparent" : "white"}
