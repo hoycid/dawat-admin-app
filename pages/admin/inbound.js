@@ -160,6 +160,9 @@ function Inbound() {
         </GridItem>
         <GridItem xs={12} sm={12} md={4}>
           <Card profile>
+            <div style={{paddingBottom: 20, paddingTop: 20}}>
+              <Chip color="primary" label="Preview"/>
+            </div>
             <CardAvatar style={{color: "#942bae"}}>
               {
                 state.type === "Memo" ? <NoteIcon style={{fontSize: 100}}/> :

@@ -160,6 +160,9 @@ function Outbound() {
         </GridItem>
         <GridItem xs={12} sm={12} md={4}>
           <Card profile>
+            <div style={{paddingBottom: 20, paddingTop: 20}}>
+              <Chip color="danger" label="Preview"/>
+            </div>
             <CardAvatar style={{color: "#e7403c"}}>
               {
                 state.type === "Memo" ? <NoteIcon style={{fontSize: 100}}/> :
