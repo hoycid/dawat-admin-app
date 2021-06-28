@@ -20,6 +20,10 @@ import CustomInput from "components/CustomInput/CustomInput.js";
 import Button from "components/CustomButtons/Button.js";
 import useWindowSize from "components/Hooks/useWindowSize.js";
 
+import GridItem from "components/Grid/GridItem.js";
+import GridContainer from "components/Grid/GridContainer.js";
+import CardAvatar from "components/Card/CardAvatar.js";
+
 import Link from "next/link";
 
 import styles from "assets/jss/nextjs-material-dashboard/components/headerLinksStyle.js";
@@ -93,7 +97,7 @@ export default function AdminNavbarLinks(props) {
           className={classes.buttonLink}
         >
           <Notifications className={classes.icons} />
-          <span className={classes.notifications}>5</span>
+          <span className={classes.notifications}>1</span>
           <Hidden mdUp implementation="css">
             <p onClick={handleCloseNotification} className={classes.linkText}>
               Notification
@@ -127,31 +131,32 @@ export default function AdminNavbarLinks(props) {
                       onClick={handleCloseNotification}
                       className={classes.dropdownItem}
                     >
-                      Mike John responded to your email
-                    </MenuItem>
-                    <MenuItem
-                      onClick={handleCloseNotification}
-                      className={classes.dropdownItem}
-                    >
-                      You have 5 new tasks
-                    </MenuItem>
-                    <MenuItem
-                      onClick={handleCloseNotification}
-                      className={classes.dropdownItem}
-                    >
-                      You{"'"}re now friend with Andrew
-                    </MenuItem>
-                    <MenuItem
-                      onClick={handleCloseNotification}
-                      className={classes.dropdownItem}
-                    >
-                      Another Notification
-                    </MenuItem>
-                    <MenuItem
-                      onClick={handleCloseNotification}
-                      className={classes.dropdownItem}
-                    >
-                      Another One
+                      <GridContainer>
+                        <GridItem xs={12} sm={2} md={2}>
+                          <CardAvatar notif>
+                          <a href="#pablo" onClick={(e) => e.preventDefault()}>
+                            <img src={""} alt="..." />
+                          </a>
+                          </CardAvatar>
+                        </GridItem>
+                        <GridItem xs={12} sm={6} md={6}>
+                          <GridContainer>
+                            <GridItem xs={12} sm={6} md={6}>
+                              Cidrex Quilang - Administrative Aide I
+                            </GridItem>
+                          </GridContainer>
+                          <GridContainer>
+                            <GridItem xs={12} sm={6} md={6}>
+                              Processed an inbound document.
+                            </GridItem>
+                          </GridContainer>
+                          <GridContainer>
+                            <GridItem xs={12} sm={6} md={6}>
+                              3:23 PM 02/05/2021
+                            </GridItem>
+                          </GridContainer>
+                        </GridItem>
+                      </GridContainer>
                     </MenuItem>
                   </MenuList>
                 </ClickAwayListener>

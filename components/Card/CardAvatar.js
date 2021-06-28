@@ -13,10 +13,11 @@ import styles from "assets/jss/nextjs-material-dashboard/components/cardAvatarSt
 export default function CardAvatar(props) {
   const useStyles = makeStyles(styles);
   const classes = useStyles();
-  const { children, className, plain, profile, ...rest } = props;
+  const { children, className, plain, profile, notif, ...rest } = props;
   const cardAvatarClasses = classNames({
     [classes.cardAvatar]: true,
     [classes.cardAvatarProfile]: profile,
+    [classes.cardAvatarNotif]: notif,
     [classes.cardAvatarPlain]: plain,
     [className]: className !== undefined,
   });

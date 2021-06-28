@@ -108,6 +108,9 @@ const headerLinksStyle = (theme) => ({
     },
     display: "inline-block",
   },
+  accordion: {
+    width: "50%"
+  },
 });
 
 export default headerLinksStyle;
