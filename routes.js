@@ -51,13 +51,13 @@ const dashboardRoutes = [
 
     layout: "/admin",
   },
-  {
-    path: "/employee-list",
-    name: "Employee List",
-    icon: GroupIcon,
+  // {
+  //   path: "/employee-list",
+  //   name: "Employee List",
+  //   icon: GroupIcon,
 
-    layout: "/admin",
-  },
+  //   layout: "/admin",
+  // },
   {
     path: "/inbound",
     name: "Inbound Documents",
