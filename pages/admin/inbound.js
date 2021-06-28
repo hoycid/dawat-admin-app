@@ -161,7 +161,7 @@ function Inbound() {
         <GridItem xs={12} sm={12} md={4}>
           <Card profile>
             <div style={{paddingBottom: 20, paddingTop: 20}}>
-              <Chip color="primary" label="Preview"/>
+              <Chip label="Preview"/>
             </div>
             <CardAvatar style={{color: "#942bae"}}>
               {
@@ -173,7 +173,7 @@ function Inbound() {
             </CardAvatar>
             <CardBody>
               <Chip icon={<DateRange />} label={`${state.date.getMonth()}/${state.date.getDay()}/${state.date.getUTCFullYear()}`}/>
-              <Chip icon={<AssignmentReturnedRoundedIcon/>} label="IN"/>
+              <Chip color="primary" icon={<AssignmentReturnedRoundedIcon/>} label="IN"/>
               <h3 className={classes.cardTitle}>{state.type ? state.type : "Document type"}</h3>
               <h4 className={classes.cardCategory}>{state.sender ? `${state.sender}` : "Source"}</h4>
               <p className={classes.description}>{state.description ? state.description : "Document description..."}</p>

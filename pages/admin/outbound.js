@@ -161,7 +161,7 @@ function Outbound() {
         <GridItem xs={12} sm={12} md={4}>
           <Card profile>
             <div style={{paddingBottom: 20, paddingTop: 20}}>
-              <Chip color="danger" label="Preview"/>
+              <Chip label="Preview"/>
             </div>
             <CardAvatar style={{color: "#e7403c"}}>
               {
@@ -173,7 +173,7 @@ function Outbound() {
             </CardAvatar>
             <CardBody>
               <Chip icon={<DateRange />} label={`${state.date.getMonth()}/${state.date.getDay()}/${state.date.getUTCFullYear()}`}/>
-              <Chip icon={<ExitToAppTwoToneIcon/>} label="OUT"/>
+              <Chip color="danger" icon={<ExitToAppTwoToneIcon/>} label="OUT"/>
               <h3 className={classes.cardTitle}>{state.type ? state.type : "Document type"}</h3>
               <h4 className={classes.cardCategory}>{state.sender ? `${state.sender}` : "Source"}</h4>
               <p className={classes.description}>{state.description ? state.description : "Document description..."}</p>

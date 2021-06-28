@@ -59,27 +59,6 @@ const dashboardRoutes = [
     layout: "/admin",
   },
   {
-    path: "/typography",
-    name: "Typography",
-    icon: LibraryBooks,
-
-    layout: "/admin",
-  },
-  {
-    path: "/icons",
-    name: "Icons",
-    icon: BubbleChart,
-
-    layout: "/admin",
-  },
-  {
-    path: "/notifications",
-    name: "Notifications",
-    icon: Notifications,
-
-    layout: "/admin",
-  },
-  {
     path: "/inbound",
     name: "Inbound Documents",
     icon: AssignmentReturnedRoundedIcon,
