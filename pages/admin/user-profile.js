@@ -79,11 +79,11 @@ function UserProfile() {
               </a>
             </CardAvatar>
             <CardBody profile>
-              <h6 className={classes.cardCategory}>{`${designation}`}</h6>
+              <h6 className={classes.cardCategory}>{`${state.designation}`}</h6>
               <h4
                 className={classes.cardTitle}
-              >{`${firstname} ${lastname}`}</h4>
-              <p className={classes.description}>{about}</p>
+              >{`${state.firstname} ${state.lastname}`}</h4>
+              <p className={classes.description}>{state.about}</p>
               {!updating ? (
                 <Button
                   color="primary"
@@ -125,7 +125,7 @@ function UserProfile() {
                       inputProps={{
                         disabled: true,
                         name: "username",
-                        value: username,
+                        value: state.username,
                       }}
                     />
                   </GridItem>
@@ -153,7 +153,7 @@ function UserProfile() {
                       inputProps={{
                         disabled: true,
                         name: "email",
-                        value: email,
+                        value: state.email,
                       }}
                     />
                   </GridItem>
@@ -169,7 +169,7 @@ function UserProfile() {
                       inputProps={{
                         disabled: updating ? false : true,
                         name: "firstname",
-                        value: firstname,
+                        value: state.firstname,
                         onChange: (e) => {
                           const { name, value } = e.target;
                           handleOnChange(name, value);
@@ -187,7 +187,7 @@ function UserProfile() {
                       inputProps={{
                         disabled: updating ? false : true,
                         name: "lastname",
-                        value: lastname,
+                        value: state.lastname,
                         onChange: (e) => {
                           const { name, value } = e.target;
                           handleOnChange(name, value);
@@ -207,7 +207,7 @@ function UserProfile() {
                       inputProps={{
                         disabled: updating ? false : true,
                         name: "designation",
-                        value: designation,
+                        value: state.designation,
                         onChange: (e) => {
                           const { name, value } = e.target;
                           handleOnChange(name, value);
@@ -227,7 +227,7 @@ function UserProfile() {
                       }}
                       inputProps={{
                         name: "about",
-                        value: about,
+                        value: state.about,
                         onChange: (e) => {
                           const { name, value } = e.target;
                           handleOnChange(name, value);
@@ -247,9 +247,12 @@ function UserProfile() {
                       color="danger"
                       onClick={() => {
                         setUpdating(false);
-                        setFirstname("Cidrex");
-                        setLastname("Quilang");
-                        setDesignation("Administrative Aide I");
+                        setState({
+                          email: "",
+                          firstname: "",
+                          lastname: "",
+                          designation: ""
+                        });
                       }}
                     >
                       Cancel
