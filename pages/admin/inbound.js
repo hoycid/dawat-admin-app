@@ -2,8 +2,8 @@ import React, { useEffect } from "react";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 import InputLabel from "@material-ui/core/InputLabel";
-import Select from '@material-ui/core/Select';
-import NativeSelect from '@material-ui/core/NativeSelect';
+import Select from "@material-ui/core/Select";
+import NativeSelect from "@material-ui/core/NativeSelect";
 // layout for this page
 import Admin from "layouts/Admin.js";
 // core components
@@ -16,19 +16,19 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardAvatar from "components/Card/CardAvatar.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
-import FormControl from '@material-ui/core/FormControl';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import Chip from '@material-ui/core/Chip';
+import FormControl from "@material-ui/core/FormControl";
+import FormHelperText from "@material-ui/core/FormHelperText";
+import Chip from "@material-ui/core/Chip";
 import Table from "components/Table/Table.js";
 
 import DateRange from "@material-ui/icons/DateRange";
 import LibraryBooks from "@material-ui/icons/LibraryBooks";
-import NoteIcon from '@material-ui/icons/Note';
-import ThumbUpIcon from '@material-ui/icons/ThumbUp';
-import RecordVoiceOverIcon from '@material-ui/icons/RecordVoiceOver';
-import SubjectTwoToneIcon from '@material-ui/icons/SubjectTwoTone';
-import AssignmentReturnedRoundedIcon from '@material-ui/icons/AssignmentReturnedRounded';
-import RefreshIcon from '@material-ui/icons/Refresh';
+import NoteIcon from "@material-ui/icons/Note";
+import ThumbUpIcon from "@material-ui/icons/ThumbUp";
+import RecordVoiceOverIcon from "@material-ui/icons/RecordVoiceOver";
+import SubjectTwoToneIcon from "@material-ui/icons/SubjectTwoTone";
+import AssignmentReturnedRoundedIcon from "@material-ui/icons/AssignmentReturnedRounded";
+import RefreshIcon from "@material-ui/icons/Refresh";
 
 import avatar from "assets/img/faces/marc.jpg";
 
@@ -60,19 +60,33 @@ const styles = {
 
 function Inbound() {
   const [state, setState] = React.useState({
-    uuid: "",
+    uuid: "123",
     type: "",
     sender: "",
     description: "",
-    date: new Date()
+    date: new Date(),
   });
 
-  const handleOnChange = (name, value) => {
-    setState({
-      ...state,
-      [name]: value.charAt(0).toUpperCase() + value.slice(1)
-    })
+  async function inboundHandler(data) {
+    const response = await fetch ("api/inbound", {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+    const res = await response.json();
+    console.log(res);
   }
+
+  const handleOnChange = (name, value) => {
+    if (name && value) {
+      setState({
+        ...state,
+        [name]: value,
+      });
+    }
+  };
 
   const useStyles = makeStyles(styles);
   const classes = useStyles();
@@ -83,35 +97,44 @@ function Inbound() {
           <Card>
             <CardHeader color="primary">
               <h4 className={classes.cardTitleWhite}>Inbound Document</h4>
-              <p className={classes.cardCategoryWhite}>Fill in document details</p>
+              <p className={classes.cardCategoryWhite}>
+                Fill in document details
+              </p>
             </CardHeader>
             <CardBody>
               <GridContainer>
                 <GridItem xs={12} sm={12} md={6}>
-                <FormControl className={classes.formControl}>
+                  <FormControl className={classes.formControl}>
                     <InputLabel>Type</InputLabel>
                     <NativeSelect
-                    value={state.type}
-                    onChange={(e) => {
-                      const {name, value} = e.target;
-                      handleOnChange(name, value)
-                    }}
-                    inputProps={{
-                        name: 'type',
-                        id: 'type',
-                    }}
+                      onChange={(e) => {
+                        const { name, value } = e.target;
+                        handleOnChange(name, value);
+                      }}
+                      inputProps={{
+                        name: "type",
+                        id: "type",
+                        value: state.type,
+                      }}
                     >
-                    <option aria-label="None" value="" />
-                    <option value="memo">Memo</option>
-                    <option value="communication">Communication</option>
-                    <option value="recommendation">Recommendation</option>
+                      <option aria-label="None" value="" />
+                      <option value="Memo">Memo</option>
+                      <option value="Communication">Communication</option>
+                      <option value="Recommendation">Recommendation</option>
                     </NativeSelect>
-                    {state.type ? "" : <FormHelperText>Select document type received</FormHelperText>}
-                </FormControl>
+                    {state.type ? (
+                      ""
+                    ) : (
+                      <FormHelperText>
+                        Select document type received
+                      </FormHelperText>
+                    )}
+                  </FormControl>
                 </GridItem>
               </GridContainer>
+              <GridContainer></GridContainer>
               <GridContainer>
-              <GridItem xs={12} sm={12} md={6}>
+                <GridItem xs={12} sm={12} md={6}>
                   <CustomInput
                     labelText="From"
                     id="sender"
@@ -122,8 +145,8 @@ function Inbound() {
                       name: "sender",
                       value: state.sender,
                       onChange: (e) => {
-                        const {name, value} = e.target;
-                        handleOnChange(name, value)
+                        const { name, value } = e.target;
+                        handleOnChange(name, value);
                       },
                     }}
                   />
@@ -141,8 +164,8 @@ function Inbound() {
                       name: "description",
                       value: state.description,
                       onChange: (e) => {
-                        const {name, value} = e.target;
-                        handleOnChange(name, value)
+                        const { name, value } = e.target;
+                        handleOnChange(name, value);
                       },
                     }}
                   />
@@ -152,7 +175,21 @@ function Inbound() {
             <CardFooter>
               <GridContainer>
                 <GridItem xs={12} sm={12} md={6}>
-                  <Button color="primary" onClick={() => { setState({}) }}>Submit</Button>
+                  <Button
+                    color="primary"
+                    onClick={() => {
+                      inboundHandler(state);
+                      setState({
+                        uuid: "",
+                        type: "",
+                        sender: "",
+                        description: "",
+                        date: new Date(),
+                      });
+                    }}
+                  >
+                    Submit
+                  </Button>
                 </GridItem>
               </GridContainer>
             </CardFooter>
@@ -160,23 +197,39 @@ function Inbound() {
         </GridItem>
         <GridItem xs={12} sm={12} md={4}>
           <Card profile>
-            <div style={{paddingBottom: 20, paddingTop: 20}}>
-              <Chip label="Preview"/>
+            <div
+              style={{ paddingBottom: 20, paddingTop: 20, textAlign: "Center" }}
+            >
+              Preview
             </div>
-            <CardAvatar style={{color: "#942bae"}}>
-              {
-                state.type === "Memo" ? <NoteIcon style={{fontSize: 100}}/> :
-                state.type === "Communication" ? <RecordVoiceOverIcon style={{fontSize: 100}}/> :
-                state.type === "Recommendation" ? <ThumbUpIcon style={{fontSize: 100}}/> :
-                <LibraryBooks style={{fontSize: 100}}/>
-              }
+            <CardAvatar style={{ color: "#942bae" }}>
+              {state.type === "Memo" ? (
+                <NoteIcon style={{ fontSize: 100 }} />
+              ) : state.type === "Communication" ? (
+                <RecordVoiceOverIcon style={{ fontSize: 100 }} />
+              ) : state.type === "Recommendation" ? (
+                <ThumbUpIcon style={{ fontSize: 100 }} />
+              ) : (
+                <LibraryBooks style={{ fontSize: 100 }} />
+              )}
             </CardAvatar>
             <CardBody>
-              <Chip icon={<DateRange />} label={`${state.date.getMonth()}/${state.date.getDay()}/${state.date.getUTCFullYear()}`}/>
-              <Chip color="primary" icon={<AssignmentReturnedRoundedIcon/>} label="IN"/>
-              <h3 className={classes.cardTitle}>{state.type ? state.type : "Document type"}</h3>
-              <h4 className={classes.cardCategory}>{state.sender ? `${state.sender}` : "Source"}</h4>
-              <p className={classes.description}>{state.description ? state.description : "Document description..."}</p>
+              <Chip
+                icon={<DateRange />}
+                label={`${state.date.getMonth()}/${state.date.getDay()}/${state.date.getUTCFullYear()}`}
+              />
+              <Chip icon={<AssignmentReturnedRoundedIcon />} label="IN" />
+              <h3 className={classes.cardTitle}>
+                {state.type ? state.type : "Document type"}
+              </h3>
+              <h4 className={classes.cardCategory}>
+                {state.sender ? `${state.sender}` : "Source"}
+              </h4>
+              <p className={classes.description}>
+                {state.description
+                  ? state.description
+                  : "Document description..."}
+              </p>
             </CardBody>
           </Card>
         </GridItem>
@@ -193,19 +246,59 @@ function Inbound() {
                   </p>
                 </GridItem>
                 <GridItem xs={12} sm={12} md={2}>
-                  <Button style={{color: "#9a33b2", backgroundColor: "White"}}><RefreshIcon/>Refresh</Button>
+                  <Button
+                    style={{ color: "#9a33b2", backgroundColor: "White" }}
+                  >
+                    <RefreshIcon />
+                    Refresh
+                  </Button>
                 </GridItem>
               </GridContainer>
             </CardHeader>
             <CardBody>
               <Table
                 tableHeaderColor="danger"
-                tableHead={["ID", "Type", "Designated", "Date", "Time"]}
+                tableHead={[
+                  "ID",
+                  "Type",
+                  "Status",
+                  "Designated",
+                  "Date",
+                  "Time",
+                ]}
                 tableData={[
-                  ["x0948", "Memo", "Emma Ravelo", "6/16/2021", "11:24AM" ],
-                  ["x0949", "Communication", "Richel Tilanduca", "6/16/2021", "10:05AM"],
-                  ["x0950", "Recommendation", "Lilith Turan", "6/16/2021", "9:55AM"],
-                  ["x0948", "Memo", "Richel Tilanduca", "6/15/2021", "3:30PM"],
+                  [
+                    "x0948",
+                    "Memo",
+                    "HEAD",
+                    "Emma Ravelo",
+                    "6/16/2021",
+                    "11:24AM",
+                  ],
+                  [
+                    "x0949",
+                    "Communication",
+                    "IN",
+                    "Richel Tilanduca",
+                    "6/16/2021",
+                    "10:05AM",
+                  ],
+                  [
+                    "x0950",
+                    "Recommendation",
+                    "OUT",
+                    "Lilith Turan",
+                    "6/16/2021",
+                    "9:55AM",
+                  ],
+                  [
+                    "x0948",
+                    "Memo",
+                    "OUT",
+                    "Richel Tilanduca",
+                    "6/15/2021",
+                    "3:30PM",
+                  ],
                 ]}
               />
             </CardBody>

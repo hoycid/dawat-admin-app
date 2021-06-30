@@ -21,34 +21,11 @@ export default function Footer(props) {
                 Home
               </a>
             </ListItem>
-            <ListItem className={classes.inlineBlock}>
-              <a href="#company" className={classes.block}>
-                Company
-              </a>
-            </ListItem>
-            <ListItem className={classes.inlineBlock}>
-              <a href="#portfolio" className={classes.block}>
-                Portfolio
-              </a>
-            </ListItem>
-            <ListItem className={classes.inlineBlock}>
-              <a href="#blog" className={classes.block}>
-                Blog
-              </a>
-            </ListItem>
           </List>
         </div>
         <p className={classes.right}>
           <span>
-            &copy; {1900 + new Date().getYear()}{" "}
-            <a
-              href="https://www.creative-tim.com?ref=njsmd-footer"
-              target="_blank"
-              className={classes.a}
-            >
-              Provincial Agriculture Office
-            </a>
-            , made with love for a better web
+            &copy; {1900 + new Date().getYear()} Provincial Agriculture Office
           </span>
         </p>
       </div>

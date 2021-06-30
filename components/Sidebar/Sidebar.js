@@ -71,9 +71,9 @@ export default function Sidebar(props) {
   var brand = (
     <div className={classes.logo}>
       <a
-        href="https://www.creative-tim.com?ref=njsmd-sidebar"
+        href=""
         className={classNames(classes.logoLink)}
-        target="_blank"
+        target=""
       >
         <div className={classes.logoImage}>
           <img src={logo} alt="logo" className={classes.img} />

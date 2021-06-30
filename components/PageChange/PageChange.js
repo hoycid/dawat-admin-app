@@ -34,6 +34,7 @@ const styles = {
 export default function PageChange(props) {
   const useStyles = makeStyles(styles);
   const classes = useStyles();
+  const path = props.path;
   return (
     <div>
       <div className={classes.wrapperDiv}>
@@ -44,11 +45,12 @@ export default function PageChange(props) {
           LOADING
           <p>
             {
-              props.path === "/admin/dashboard" ? "Dashboard" :
-              props.path === "/admin/table-list" ? "Activity Logs" :
-              props.path === "/admin/user-profile" ? "User Profile" :
-              props.path === "/admin/employee-list" ? "Employees" :
-              props.path
+              path === "/admin/dashboard" ? "Dashboard" :
+              path === "/admin/table-list" ? "Activity Logs" :
+              path === "/admin/user-profile" ? "User Profile" :
+              path === "/admin/inbound" ? "Inbound Documents" :
+              path === "/admin/inbound" ? "Outbound Documents" :
+              path === "/admin/inbound" ? "Settings" : ""
             }
           </p>
         </h4>

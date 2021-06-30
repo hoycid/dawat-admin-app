@@ -59,28 +59,30 @@ function Dashboard() {
     <div>
       <GridContainer>
         <GridItem xs={12} sm={6} md={6}>
-          <Link href='/admin/inbound'>
-            <Card>
-              <CardHeader color="warning" stats icon>
-                <CardIcon color="warning">
-                  <AssignmentReturnedRoundedIcon/>
-                </CardIcon>
-                <p className={classes.cardCategory}>INBOUND DOCUMENTS</p>
-                <h3 className={classes.cardTitle}>
-                  0 <small>out of</small> 0
-                </h3>
-              </CardHeader>
-              <CardFooter stats>
-                <div className={classes.stats}>
-                  <HelpOutlineIcon/>
-                  Click to process an inbound document
-                </div>
-              </CardFooter>
-            </Card>
-          </Link>
+            
+              <Card>
+                <CardHeader color="warning" stats icon>
+                  <CardIcon color="warning">
+                    <AssignmentReturnedRoundedIcon/>
+                  </CardIcon>
+                  <p className={classes.cardCategory}>INBOUND DOCUMENTS</p>
+                  <h3 className={classes.cardTitle}>
+                    0 <small>out of</small> 0
+                  </h3>
+                </CardHeader>
+                <CardFooter stats>
+                  <div className={classes.stats}>
+                    <Link href='/admin/inbound'>
+                      <a href="#pablo" onClick={(e) => e.preventDefault()}>
+                        <HelpOutlineIcon/>
+                        Click to process an inbound document
+                      </a>
+                    </Link>
+                  </div>
+                </CardFooter>
+              </Card>
         </GridItem>
         <GridItem xs={12} sm={6} md={6}>
-          <a href="#pablo" onClick={(e) => e.preventDefault()}>
             <Card>
               <CardHeader color="danger" stats icon>
                 <CardIcon color="danger">
@@ -93,12 +95,15 @@ function Dashboard() {
               </CardHeader>
               <CardFooter stats>
                 <div className={classes.stats}>
-                  <HelpOutlineIcon/>
-                  Click to process and designate an outbound document
+                  <Link href='/admin/outbound'>
+                    <a href="#pablo" onClick={(e) => e.preventDefault()}>
+                      <HelpOutlineIcon/>
+                      Click to process and designate an outbound document
+                    </a>
+                  </Link>
                 </div>
               </CardFooter>
             </Card>
-          </a>
         </GridItem>
       </GridContainer>
       <GridContainer>
@@ -184,7 +189,7 @@ function Dashboard() {
       <GridContainer>
         <GridItem xs={12} sm={12} md={6}>
           <CustomTabs
-            title="Inbound Feed:"
+            title="Processing Feed:"
             headerColor="dark"
             tabs={[
               {

@@ -134,9 +134,12 @@ export default function AdminNavbarLinks(props) {
                       <GridContainer>
                         <GridItem xs={12} sm={2} md={2}>
                           <CardAvatar notif>
-                          <a href="#pablo" onClick={(e) => e.preventDefault()}>
-                            <img src={""} alt="..." />
-                          </a>
+                            <a
+                              href="#pablo"
+                              onClick={(e) => e.preventDefault()}
+                            >
+                              <img src={""} alt="..." />
+                            </a>
                           </CardAvatar>
                         </GridItem>
                         <GridItem xs={12} sm={6} md={6}>
@@ -147,7 +150,7 @@ export default function AdminNavbarLinks(props) {
                           </GridContainer>
                           <GridContainer>
                             <GridItem xs={12} sm={6} md={6}>
-                              Processed an inbound document.
+                              Processed an inbound document 1 minute ago
                             </GridItem>
                           </GridContainer>
                           <GridContainer>
@@ -211,13 +214,14 @@ export default function AdminNavbarLinks(props) {
                         Profile
                       </MenuItem>
                     </Link>
-                    
-                    <MenuItem
-                      onClick={handleCloseProfile}
-                      className={classes.dropdownItem}
-                    >
-                      Settings
-                    </MenuItem>
+                    <Link href={"/admin/settings"}>
+                      <MenuItem
+                        onClick={handleCloseProfile}
+                        className={classes.dropdownItem}
+                      >
+                        Settings
+                      </MenuItem>
+                    </Link>
                     <Divider light />
                     <MenuItem
                       onClick={handleCloseProfile}

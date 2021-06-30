@@ -24,10 +24,11 @@ import LocationOn from "@material-ui/icons/LocationOn";
 import Notifications from "@material-ui/icons/Notifications";
 import Unarchive from "@material-ui/icons/Unarchive";
 import Language from "@material-ui/icons/Language";
-import HistoryIcon from '@material-ui/icons/History';
-import GroupIcon from '@material-ui/icons/Group';
-import AssignmentReturnedRoundedIcon from '@material-ui/icons/AssignmentReturnedRounded';
-import ExitToAppTwoToneIcon from '@material-ui/icons/ExitToAppTwoTone';
+import HistoryIcon from "@material-ui/icons/History";
+import GroupIcon from "@material-ui/icons/Group";
+import AssignmentReturnedRoundedIcon from "@material-ui/icons/AssignmentReturnedRounded";
+import ExitToAppTwoToneIcon from "@material-ui/icons/ExitToAppTwoTone";
+import Code from "@material-ui/icons/Code";
 
 const dashboardRoutes = [
   {
@@ -68,6 +69,13 @@ const dashboardRoutes = [
     path: "/outbound",
     name: "Outbound Documents",
     icon: ExitToAppTwoToneIcon,
+    layout: "/admin",
+  },
+  {
+    path: "/settings",
+    name: "Settings",
+    icon: Code,
+
     layout: "/admin",
   },
 ];
