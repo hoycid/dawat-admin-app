@@ -8,18 +8,17 @@ async function handler(req, res) {
         const data = req.body;
     }
 
-    const connection = await MongoClient.connect("mongodb+srv://cid-admin:dhmdl33leh05243@pagro-admin.szvh2.mongodb.net/pagro-admin?retryWrites=true&w=majority");
-    const db = connection.db();
+    const url = "mongodb+srv://cid-admin:12345@pagro-admin.szvh2.mongodb.net/pagroadmin?retryWrites=true&w=majority";
+    const client = await MongoClient.connect(url);
+    const db = client.db();
 
-    console.log(db)
-
-    const inboundCollection = db.collection("inbound");
+    const inboundCollection = db.collection("inbounds");
 
     const result = await inboundCollection.insertOne(data);
 
     console.log(result);
 
-    connection.close();
+    client.close();
 
     res.status(201).json({ message: "Inbound document successfully processed!" })
 }
