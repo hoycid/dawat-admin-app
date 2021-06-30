@@ -139,7 +139,7 @@ function UserProfile() {
                       inputProps={{
                         disabled: true,
                         name: "password",
-                        value: password,
+                        value: state.password,
                       }}
                     />
                   </GridItem>
