@@ -11,6 +11,8 @@ async function handler(req, res) {
     const connection = await MongoClient.connect("mongodb+srv://cid-admin:dhmdl33leh05243@pagro-admin.szvh2.mongodb.net/pagro-admin?retryWrites=true&w=majority");
     const db = connection.db();
 
+    console.log(db)
+
     const inboundCollection = db.collection("inbound");
 
     const result = await inboundCollection.insertOne(data);

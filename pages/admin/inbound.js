@@ -68,7 +68,7 @@ function Inbound() {
   });
 
   async function inboundHandler(data) {
-    const response = await fetch ("api/inbound", {
+    const response = await fetch ("/api/inbound", {
       method: "POST",
       body: JSON.stringify(data),
       headers: {
