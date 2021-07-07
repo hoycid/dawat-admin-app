@@ -45,6 +45,58 @@ const styles = {
 function TableList() {
   const useStyles = makeStyles(styles);
   const classes = useStyles();
+
+  const [data, setData] = React.useState([]);
+  const [loadingData, setLoadingData] = React.useState(true);
+
+  React.useEffect(() => {
+    getData();
+    
+    return function cleanup() {
+      // to stop the warning of calling setState of unmounted component
+      var id = window.setTimeout(null, 0);
+      while (id--) {
+        window.clearTimeout(id);
+      }
+    };
+  }, [loadingData]);
+
+  async function getData() {
+    const data = [];
+    const getInboundFetchResponse = await fetch("/api/inbound", {
+      method: "GET",
+      body: JSON.stringify(),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const getInboundResponse = await getInboundFetchResponse.json();
+    if (getInboundResponse.success) {
+      data.push(getInboundResponse.data);
+      setData(...data);
+      setLoadingData(false);
+      console.log(data);
+    } else {
+      showNotification("loadingInboundsFailed");
+    }
+  }
+
+  const showNotification = (type) => {
+    switch (type) {
+      case "loadingInboundsFailed":
+        if (!loadingInboundsFailed) {
+          setLoadingInboundsFailed(true);
+          setTimeout(function () {
+            setLoadingInboundsFailed(false);
+          }, 4000);
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
@@ -58,15 +110,8 @@ function TableList() {
           <CardBody>
             <Table
               tableHeaderColor="primary"
-              tableHead={["ID", "Action", "Type", "Bound for", "Date", "Time"]}
-              tableData={[
-                ["x0486859", "OUT", "Memo", "Emma Ravelo", "6/22/2021", "3:10PM"],
-                ["x0486858", "HEAD", "Memo", "Alson Quimba", "6/22/2021", "3:00PM"],
-                ["x0486857", "IN", "Memo", "Emma Ravelo", "6/22/2021", "2:16PM"],
-                ["x0486856", "OUT", "Memo", "Richel Tilanduca", "6/22/2021", "2:07PM"],
-                ["x0486855", "HEAD", "Memo", "Alson Quimba", "6/22/2021", "2:05PM"],
-                ["x0486854", "IN", "Memo", "Richel Tilanduca", "6/22/2021", "2:00PM"],
-              ]}
+              tableHead={["ID", "Reciever", "Type", "Description", "Sender", "Recipient", "Date"]}
+              tableData={data.map(doc => [doc._id, "SAMPLE Cidrex", doc.type, doc.description, doc.sender, "SAMPLE Emma Ravelo", doc.date])}
             />
           </CardBody>
         </Card>
@@ -84,56 +129,9 @@ function TableList() {
           <CardBody>
             <Table
               tableHeaderColor="primary"
-              tableHead={["ID", "Type", "Recipient", "Description", "Date", "Time"]}
+              tableHead={["ID", "Reciever", "Type", "Description", "Sender", "Recipient", "Date"]}
               tableData={[
-                [
-                  "x0486854",
-                  "Memo",
-                  "Richel Tilanduca",
-                  "Sign contract for What are conference organizers afraid of?",
-                  "6/22/2021",
-                  "2:00PM"
-                ],
-                [
-                  "x0486854",
-                  "Communication",
-                  "Alson Quimba",
-                  "Sign contract for What are conference organizers afraid of?",
-                  "6/22/2021",
-                  "3:00PM"
-                ],
-                [
-                  "x0486854",
-                  "Memo",
-                  "Alson Quimba",
-                  "Sign contract for What are conference organizers afraid of?",
-                  "6/22/2021",
-                  "2:00PM"
-                ],
-                [
-                  "x0486854",
-                  "Memo",
-                  "Alson Quimba",
-                  "Sign contract for What are conference organizers afraid of?",
-                  "6/22/2021",
-                  "2:00PM"
-                ],
-                [
-                  "x0486854",
-                  "Recommendation",
-                  "Richel Tilanduca",
-                  "Sign contract for What are conference organizers afraid of?",
-                  "6/22/2021",
-                  "2:00PM"
-                ],
-                [
-                  "x0486854",
-                  "Memo",
-                  "Alson Quimba",
-                  "Sign contract for What are conference organizers afraid of?",
-                  "6/22/2021",
-                  "2:00PM"
-                ],
+                
               ]}
             />
           </CardBody>

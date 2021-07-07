@@ -10,4 +10,7 @@ module.exports = withPlugins([[withSass], [withImages], [withCSS]], {
     config.resolve.modules.push(path.resolve("./"));
     return config;
   },
+  env: {
+    MONGO_URI: "mongodb+srv://cid-admin:12345@pagro-admin.szvh2.mongodb.net/PagroDB?retryWrites=true&w=majority"
+  }
 });

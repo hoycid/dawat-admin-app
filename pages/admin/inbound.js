@@ -1,4 +1,6 @@
-import React, { useEffect } from "react";
+import React from "react";
+import ReactDOM from "react-dom";
+
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 import InputLabel from "@material-ui/core/InputLabel";
@@ -29,7 +31,16 @@ import RecordVoiceOverIcon from "@material-ui/icons/RecordVoiceOver";
 import SubjectTwoToneIcon from "@material-ui/icons/SubjectTwoTone";
 import AssignmentReturnedRoundedIcon from "@material-ui/icons/AssignmentReturnedRounded";
 import RefreshIcon from "@material-ui/icons/Refresh";
+import DoneOutlineIcon from "@material-ui/icons/DoneOutline";
+import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 
+import Snackbar from "components/Snackbar/Snackbar.js";
+
+import PageChange from "components/PageChange/PageChange.js";
+
+import moment from 'moment';
+
+import Icon from "@material-ui/core/Icon";
 import avatar from "assets/img/faces/marc.jpg";
 
 const styles = {
@@ -59,33 +70,132 @@ const styles = {
 };
 
 function Inbound() {
+  const currentDate = moment().format("MM/DD/YYYY, hh:mm:ss")
+
   const [state, setState] = React.useState({
-    uuid: "123",
     type: "",
     sender: "",
     description: "",
-    date: new Date(),
+    date: moment().format("MM/DD/YYYY, hh:mm:ss")
   });
+  const [inboundDocs, setInboundDocs] = React.useState([]);
+  const [loadingData, setLoadingData] = React.useState(true);
+  const [loadingInboundsFailed, setLoadingInboundsFailed] =
+    React.useState(false);
+  const [documentTypes, setDocumentTypes] = React.useState([]);
+  const [notificationFail, setNotificationFail] = React.useState(false);
+  const [notificationSuccess, setnotificationSuccess] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!inboundDocs.length) getData();
+
+    return function cleanup() {
+      // to stop the warning of calling setState of unmounted component
+      var id = window.setTimeout(null, 0);
+      while (id--) {
+        window.clearTimeout(id);
+      }
+    };
+  }, [loadingData]);
+
+  async function getData() {
+    const getInboundFetchResponse = await fetch("/api/inbound", {
+      method: "GET",
+      body: JSON.stringify(),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const getDocumentTypesFetchResponse = await fetch("/api/types", {
+      method: "GET",
+      body: JSON.stringify(),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const getDocumentTypesResponse = await getDocumentTypesFetchResponse.json();
+    if (getDocumentTypesResponse.success) {
+      setDocumentTypes(getDocumentTypesResponse.data);
+    }
+
+    const getInboundResponse = await getInboundFetchResponse.json();
+    if (getInboundResponse.success) {
+      setInboundDocs(getInboundResponse.data);
+      setLoadingData(false);
+    } else {
+      showNotification("loadingInboundsFailed");
+    }
+  }
+
+  const showNotification = (type) => {
+    switch (type) {
+      case "success":
+        if (!notificationSuccess) {
+          setnotificationSuccess(true);
+          setTimeout(function () {
+            setnotificationSuccess(false);
+          }, 4000);
+        }
+        break;
+      case "failed":
+        if (!notificationFail) {
+          setNotificationFail(true);
+          setTimeout(function () {
+            setnotificationFail(false);
+          }, 4000);
+        }
+        break;
+      case "loadingInboundsFailed":
+        if (!loadingInboundsFailed) {
+          setLoadingInboundsFailed(true);
+          setTimeout(function () {
+            setLoadingInboundsFailed(false);
+          }, 4000);
+        }
+        break;
+      default:
+        break;
+    }
+  };
 
   async function inboundHandler(data) {
-    const response = await fetch ("/api/inbound", {
+    document.body.classList.add("body-page-transition");
+    ReactDOM.render(
+      <PageChange path={"/admin/inbound-sent"} />,
+      document.getElementById("page-transition")
+    );
+    const response = await fetch("/api/inbound", {
       method: "POST",
       body: JSON.stringify(data),
       headers: {
-        "Content-Type": "application/json"
-      }
+        "Content-Type": "application/json",
+      },
     });
     const res = await response.json();
-    console.log(res);
+    if (res.success) {
+      setState({
+        type: "",
+        sender: "",
+        description: "",
+        date: currentDate,
+      });
+      ReactDOM.unmountComponentAtNode(
+        document.getElementById("page-transition")
+      );
+      document.body.classList.remove("body-page-transition");
+      showNotification("success");
+    } else {
+      showNotification("failed");
+    }
   }
 
   const handleOnChange = (name, value) => {
-    if (name && value) {
-      setState({
-        ...state,
-        [name]: value,
-      });
-    }
+    setState({
+      ...state,
+      [name]: value,
+    });
   };
 
   const useStyles = makeStyles(styles);
@@ -118,9 +228,13 @@ function Inbound() {
                       }}
                     >
                       <option aria-label="None" value="" />
-                      <option value="Memo">Memo</option>
-                      <option value="Communication">Communication</option>
-                      <option value="Recommendation">Recommendation</option>
+                      {documentTypes.map((type, index) => {
+                        return (
+                          <option value={type.name} key={index}>
+                            {type.name}
+                          </option>
+                        );
+                      })}
                     </NativeSelect>
                     {state.type ? (
                       ""
@@ -179,13 +293,6 @@ function Inbound() {
                     color="primary"
                     onClick={() => {
                       inboundHandler(state);
-                      setState({
-                        uuid: "",
-                        type: "",
-                        sender: "",
-                        description: "",
-                        date: new Date(),
-                      });
                     }}
                   >
                     Submit
@@ -203,20 +310,12 @@ function Inbound() {
               Preview
             </div>
             <CardAvatar style={{ color: "#942bae" }}>
-              {state.type === "Memo" ? (
-                <NoteIcon style={{ fontSize: 100 }} />
-              ) : state.type === "Communication" ? (
-                <RecordVoiceOverIcon style={{ fontSize: 100 }} />
-              ) : state.type === "Recommendation" ? (
-                <ThumbUpIcon style={{ fontSize: 100 }} />
-              ) : (
-                <LibraryBooks style={{ fontSize: 100 }} />
-              )}
+              <SubjectTwoToneIcon style={{ fontSize: 100 }} />
             </CardAvatar>
             <CardBody>
               <Chip
                 icon={<DateRange />}
-                label={`${state.date.getMonth()}/${state.date.getDay()}/${state.date.getUTCFullYear()}`}
+                label={`${moment(state.date).format("MM/DD/YYYY, hh:mm A")}`}
               />
               <Chip icon={<AssignmentReturnedRoundedIcon />} label="IN" />
               <h3 className={classes.cardTitle}>
@@ -248,6 +347,9 @@ function Inbound() {
                 <GridItem xs={12} sm={12} md={2}>
                   <Button
                     style={{ color: "#9a33b2", backgroundColor: "White" }}
+                    onClick={() => {
+                      getData();
+                    }}
                   >
                     <RefreshIcon />
                     Refresh
@@ -259,51 +361,38 @@ function Inbound() {
               <Table
                 tableHeaderColor="danger"
                 tableHead={[
-                  "ID",
+                  "Receiver",
                   "Type",
-                  "Status",
-                  "Designated",
-                  "Date",
-                  "Time",
+                  "Description",
+                  "Date"
                 ]}
-                tableData={[
-                  [
-                    "x0948",
-                    "Memo",
-                    "HEAD",
-                    "Emma Ravelo",
-                    "6/16/2021",
-                    "11:24AM",
-                  ],
-                  [
-                    "x0949",
-                    "Communication",
-                    "IN",
-                    "Richel Tilanduca",
-                    "6/16/2021",
-                    "10:05AM",
-                  ],
-                  [
-                    "x0950",
-                    "Recommendation",
-                    "OUT",
-                    "Lilith Turan",
-                    "6/16/2021",
-                    "9:55AM",
-                  ],
-                  [
-                    "x0948",
-                    "Memo",
-                    "OUT",
-                    "Richel Tilanduca",
-                    "6/15/2021",
-                    "3:30PM",
-                  ],
-                ]}
+                tableData={inboundDocs.map(doc => ["Cidrex", doc.type, doc.description, moment(doc.date).format("MM/DD/YYYY, hh:mm A")])}
               />
             </CardBody>
           </Card>
         </GridItem>
+        <GridContainer justify={"center"}>
+          <GridItem xs={12} sm={12} md={3}>
+            <Snackbar
+              place="br"
+              color="success"
+              icon={DoneOutlineIcon}
+              message="Inbound document has been saved successfuly!"
+              open={notificationSuccess}
+              closeNotification={() => setNotificationSuccess(false)}
+              close
+            />
+            <Snackbar
+              place="br"
+              color="danger"
+              icon={ErrorOutlineIcon}
+              message="Oops! An error occured. Inbound document was not saved."
+              open={notificationFail}
+              closeNotification={() => setnotificationFail(false)}
+              close
+            />
+          </GridItem>
+        </GridContainer>
       </GridContainer>
     </div>
   );
