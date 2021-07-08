@@ -3,23 +3,22 @@ import mongoose from "mongoose";
 const InboundSchema = new mongoose.Schema({
     type: {
         type: String,
-        required: [true, 'add type'],
-        maxLength: [40, 'type must be 40 chars']
+        required: [true, 'Missing type!'],
+        maxLength: [40, 'Type must be less than 40 chars!']
     },
     sender: {
         type: String,
-        required: [true, 'add sender'],
-        maxLength: [40, 'sender must be 40 chars']
+        required: [true, 'Missing sender!'],
+        maxLength: [40, 'Sender must be less than 40 characters!']
     },
     description: {
         type: String,
         required: [false],
-        maxLength: [200, 'desc must be 200 chars']
+        maxLength: [200, 'Description must be less than 400 characters!']
     },
     date: {
-        type: Date,
-        default: Date.now,
-        required: [true]
+        type: String,
+        required: [true, 'Missing sender!']
     }
 })
 
