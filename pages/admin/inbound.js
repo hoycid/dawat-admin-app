@@ -9,6 +9,10 @@ import NativeSelect from "@material-ui/core/NativeSelect";
 import FormControl from "@material-ui/core/FormControl";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import Chip from "@material-ui/core/Chip";
+import Modal from '@material-ui/core/Modal';
+import Backdrop from '@material-ui/core/Backdrop';
+import Fade from '@material-ui/core/Fade';
+import Icon from "@material-ui/core/Icon";
 
 // layout for this page
 import Admin from "layouts/Admin.js";
@@ -26,7 +30,6 @@ import CardFooter from "components/Card/CardFooter.js";
 import Table from "components/Table/Table.js";
 import Snackbar from "components/Snackbar/Snackbar.js";
 import PageChange from "components/PageChange/PageChange.js";
-import Icon from "@material-ui/core/Icon";
 
 // material icons
 import DateRange from "@material-ui/icons/DateRange";
@@ -41,11 +44,24 @@ import DoneOutlineIcon from "@material-ui/icons/DoneOutline";
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
 
+import Image from 'next/image'
+
 import moment from "moment";
 
 import avatar from "assets/img/faces/marc.jpg";
 
 const styles = {
+  modal: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxShadow: 3
+  },
+  paper: {
+    backgroundColor: "transparent",
+    border: 0,
+    boxShadow: 3,
+  },
   paragraphClickable: {
     fontSize: 12,
     color: "black",
@@ -82,17 +98,22 @@ function Inbound() {
   const [loadingInboundsFailed, setLoadingInboundsFailed] =
     React.useState(false);
 
-  const [notificationFail, setNotificationFail] = React.useState(false);
+  const [openAttachModal, setOpenAttachModal] = React.useState(false);
+
   const [notificationSuccess, setNotificationSuccess] = React.useState(false);
+  const [notificationFail, setNotificationFail] = React.useState(false);
   const [notificationIncomplete, setNotificationIncomplete] =
     React.useState(false);
 
   const [state, setState] = React.useState({
+    img: avatar,
     type: "",
     sender: "",
     description: "",
     date: moment().format(),
   });
+
+  const inputRef = React.useRef();
 
   React.useEffect(() => {
     getData();
@@ -154,6 +175,7 @@ function Inbound() {
       const res = await response.json();
       if (res.success) {
         setState({
+          img: avatar,
           type: "",
           sender: "",
           description: "",
@@ -177,6 +199,19 @@ function Inbound() {
       ...state,
       [name]: value,
     });
+  };
+
+  const handleChooseFile = () => {
+    const { current } = inputRef
+    (current || { click: () => {}}).click()
+  };
+
+  const handleOpenAttachModal = () => {
+    setOpenAttachModal(true);
+  };
+
+  const handleCloseAttachModal = () => {
+    setOpenAttachModal(false);
   };
 
   const showNotification = (type) => {
@@ -267,7 +302,6 @@ function Inbound() {
                   </FormControl>
                 </GridItem>
               </GridContainer>
-              <GridContainer></GridContainer>
               <GridContainer>
                 <GridItem xs={12} sm={12} md={6}>
                   <CustomInput
@@ -324,7 +358,7 @@ function Inbound() {
             <CardFooter>
               <GridContainer>
                 <GridItem xs={12} sm={12} md={6}>
-                  <Button color="primary" onClick={() => {}}>
+                  <Button color="primary" onClick={handleOpenAttachModal}>
                     Attach file
                   </Button>
                 </GridItem>
@@ -432,6 +466,68 @@ function Inbound() {
             />
           </GridItem>
         </GridContainer>
+      </GridContainer>
+      <GridContainer>
+        <Modal
+          className={classes.modal}
+          open={openAttachModal}
+          onClose={handleCloseAttachModal}
+          closeAfterTransition
+          BackdropComponent={Backdrop}
+          BackdropProps={{
+            timeout: 10,
+          }}
+        >
+          <Fade in={openAttachModal}>
+            <div className={classes.paper}>
+              <Card profile>
+                <div
+                  style={{
+                    paddingBottom: 20,
+                    paddingTop: 8,
+                    textAlign: "Center",
+                  }}
+                >
+                  <CardHeader color="primary">
+                    <h4 className={classes.cardTitleWhite}>Attach File</h4>
+                    <p className={classes.cardCategoryWhite}>
+                      Attach a scanned copy of the document
+                    </p>
+                  </CardHeader>
+                </div>
+                <CardAvatar>
+                  <img src={state.img} alt={`${state.img}`} />
+                </CardAvatar>
+                <CardBody>
+                  <input
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      console.log( e.target.files[0].file)
+                      //handleOnChange("img", e.target.files[0].file);
+                    }}
+                    id="select-file"
+                    type="file"
+                    ref={inputRef}
+                    style={{ display: "none" }}
+                  />
+                  <Button color="primary" onClick={handleChooseFile}>
+                    Browse file
+                  </Button>
+                  <Button
+                    color="primary"
+                    onClick={() => {
+                      setState({ ...state, img: "" });
+                      setOpenAttachModal(false);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </CardBody>
+              </Card>
+            </div>
+          </Fade>
+        </Modal>
       </GridContainer>
     </div>
   );
