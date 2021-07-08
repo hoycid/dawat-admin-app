@@ -6,8 +6,13 @@ import { makeStyles } from "@material-ui/core/styles";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
 import NativeSelect from "@material-ui/core/NativeSelect";
+import FormControl from "@material-ui/core/FormControl";
+import FormHelperText from "@material-ui/core/FormHelperText";
+import Chip from "@material-ui/core/Chip";
+
 // layout for this page
 import Admin from "layouts/Admin.js";
+
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
@@ -18,11 +23,12 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardAvatar from "components/Card/CardAvatar.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
-import FormControl from "@material-ui/core/FormControl";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import Chip from "@material-ui/core/Chip";
 import Table from "components/Table/Table.js";
+import Snackbar from "components/Snackbar/Snackbar.js";
+import PageChange from "components/PageChange/PageChange.js";
+import Icon from "@material-ui/core/Icon";
 
+// material icons
 import DateRange from "@material-ui/icons/DateRange";
 import LibraryBooks from "@material-ui/icons/LibraryBooks";
 import NoteIcon from "@material-ui/icons/Note";
@@ -33,23 +39,22 @@ import AssignmentReturnedRoundedIcon from "@material-ui/icons/AssignmentReturned
 import RefreshIcon from "@material-ui/icons/Refresh";
 import DoneOutlineIcon from "@material-ui/icons/DoneOutline";
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
+import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
 
-import Snackbar from "components/Snackbar/Snackbar.js";
+import moment from "moment";
 
-import PageChange from "components/PageChange/PageChange.js";
-
-import moment from 'moment';
-
-import Icon from "@material-ui/core/Icon";
 import avatar from "assets/img/faces/marc.jpg";
 
 const styles = {
-  formControl: {
-    // margin: theme.spacing(1),
-    minWidth: 120,
+  paragraphClickable: {
+    fontSize: 12,
+    color: "black",
+    '&:hover': {
+      color: "#D1B8D6",
+    }
   },
-  selectEmpty: {
-    // marginTop: theme.spacing(2),
+  formControl: {
+    minWidth: 120,
   },
   cardCategoryWhite: {
     color: "rgba(255,255,255,.62)",
@@ -70,24 +75,27 @@ const styles = {
 };
 
 function Inbound() {
-  const currentDate = moment().format("MM/DD/YYYY, hh:mm:ss")
+  const [inboundDocs, setInboundDocs] = React.useState([]);
+  const [documentTypes, setDocumentTypes] = React.useState([]);
+
+  const [loadingData, setLoadingData] = React.useState(true);
+  const [loadingInboundsFailed, setLoadingInboundsFailed] =
+    React.useState(false);
+
+  const [notificationFail, setNotificationFail] = React.useState(false);
+  const [notificationSuccess, setNotificationSuccess] = React.useState(false);
+  const [notificationIncomplete, setNotificationIncomplete] =
+    React.useState(false);
 
   const [state, setState] = React.useState({
     type: "",
     sender: "",
     description: "",
-    date: moment().format("MM/DD/YYYY, hh:mm:ss")
+    date: moment().format(),
   });
-  const [inboundDocs, setInboundDocs] = React.useState([]);
-  const [loadingData, setLoadingData] = React.useState(true);
-  const [loadingInboundsFailed, setLoadingInboundsFailed] =
-    React.useState(false);
-  const [documentTypes, setDocumentTypes] = React.useState([]);
-  const [notificationFail, setNotificationFail] = React.useState(false);
-  const [notificationSuccess, setnotificationSuccess] = React.useState(false);
 
   React.useEffect(() => {
-    if (!inboundDocs.length) getData();
+    getData();
 
     return function cleanup() {
       // to stop the warning of calling setState of unmounted component
@@ -129,13 +137,55 @@ function Inbound() {
     }
   }
 
+  async function handleSubmit(data) {
+    if (data.type && data.description) {
+      document.body.classList.add("body-page-transition");
+      ReactDOM.render(
+        <PageChange path={"/admin/inbound-sent"} />,
+        document.getElementById("page-transition")
+      );
+      const response = await fetch("/api/inbound", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const res = await response.json();
+      if (res.success) {
+        setState({
+          type: "",
+          sender: "",
+          description: "",
+          date: moment().format(),
+        });
+        ReactDOM.unmountComponentAtNode(
+          document.getElementById("page-transition")
+        );
+        document.body.classList.remove("body-page-transition");
+        showNotification("success");
+      } else {
+        showNotification("failed");
+      }
+    } else {
+      showNotification("incomplete");
+    }
+  }
+
+  const handleOnChange = (name, value) => {
+    setState({
+      ...state,
+      [name]: value,
+    });
+  };
+
   const showNotification = (type) => {
     switch (type) {
       case "success":
         if (!notificationSuccess) {
-          setnotificationSuccess(true);
+          setNotificationSuccess(true);
           setTimeout(function () {
-            setnotificationSuccess(false);
+            setNotificationSuccess(false);
           }, 4000);
         }
         break;
@@ -143,7 +193,15 @@ function Inbound() {
         if (!notificationFail) {
           setNotificationFail(true);
           setTimeout(function () {
-            setnotificationFail(false);
+            setNotificationFail(false);
+          }, 4000);
+        }
+        break;
+      case "incomplete":
+        if (!notificationIncomplete) {
+          setNotificationIncomplete(true);
+          setTimeout(function () {
+            setNotificationIncomplete(false);
           }, 4000);
         }
         break;
@@ -160,46 +218,9 @@ function Inbound() {
     }
   };
 
-  async function inboundHandler(data) {
-    document.body.classList.add("body-page-transition");
-    ReactDOM.render(
-      <PageChange path={"/admin/inbound-sent"} />,
-      document.getElementById("page-transition")
-    );
-    const response = await fetch("/api/inbound", {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const res = await response.json();
-    if (res.success) {
-      setState({
-        type: "",
-        sender: "",
-        description: "",
-        date: currentDate,
-      });
-      ReactDOM.unmountComponentAtNode(
-        document.getElementById("page-transition")
-      );
-      document.body.classList.remove("body-page-transition");
-      showNotification("success");
-    } else {
-      showNotification("failed");
-    }
-  }
-
-  const handleOnChange = (name, value) => {
-    setState({
-      ...state,
-      [name]: value,
-    });
-  };
-
   const useStyles = makeStyles(styles);
   const classes = useStyles();
+
   return (
     <div>
       <GridContainer>
@@ -236,12 +257,12 @@ function Inbound() {
                         );
                       })}
                     </NativeSelect>
-                    {state.type ? (
-                      ""
-                    ) : (
+                    {notificationIncomplete ? (
                       <FormHelperText>
-                        Select document type received
+                        Select document type received.
                       </FormHelperText>
+                    ) : (
+                      ""
                     )}
                   </FormControl>
                 </GridItem>
@@ -264,6 +285,13 @@ function Inbound() {
                       },
                     }}
                   />
+                  {notificationIncomplete ? (
+                    <FormHelperText>
+                      Enter document source or sender.
+                    </FormHelperText>
+                  ) : (
+                    ""
+                  )}
                 </GridItem>
               </GridContainer>
               <GridContainer>
@@ -283,19 +311,21 @@ function Inbound() {
                       },
                     }}
                   />
+                  {state.description ? (
+                    <FormHelperText>
+                      (Optional) Enter document description.
+                    </FormHelperText>
+                  ) : (
+                    ""
+                  )}
                 </GridItem>
               </GridContainer>
             </CardBody>
             <CardFooter>
               <GridContainer>
                 <GridItem xs={12} sm={12} md={6}>
-                  <Button
-                    color="primary"
-                    onClick={() => {
-                      inboundHandler(state);
-                    }}
-                  >
-                    Submit
+                  <Button color="primary" onClick={() => {}}>
+                    Attach file
                   </Button>
                 </GridItem>
               </GridContainer>
@@ -360,13 +390,13 @@ function Inbound() {
             <CardBody>
               <Table
                 tableHeaderColor="danger"
-                tableHead={[
-                  "Receiver",
-                  "Type",
-                  "Description",
-                  "Date"
-                ]}
-                tableData={inboundDocs.map(doc => ["Cidrex", doc.type, doc.description, moment(doc.date).format("MM/DD/YYYY, hh:mm A")])}
+                tableHead={["Receiver", "Type", "Description", "Date"]}
+                tableData={inboundDocs.map((doc) => [
+                  "Cidrex",
+                  doc.type,
+                  doc.description,
+                  moment(doc.date).format("MM/DD/YYYY, hh:mm A"),
+                ])}
               />
             </CardBody>
           </Card>
@@ -377,18 +407,27 @@ function Inbound() {
               place="br"
               color="success"
               icon={DoneOutlineIcon}
-              message="Inbound document has been saved successfuly!"
+              message="Inbound document has been saved successfully!"
               open={notificationSuccess}
               closeNotification={() => setNotificationSuccess(false)}
               close
             />
             <Snackbar
               place="br"
+              color="warning"
+              icon={ErrorOutlineIcon}
+              message="Please complete the required document details."
+              open={notificationIncomplete}
+              closeNotification={() => setNotificationIncomplete(false)}
+              close
+            />
+            <Snackbar
+              place="br"
               color="danger"
               icon={ErrorOutlineIcon}
-              message="Oops! An error occured. Inbound document was not saved."
+              message="Oops! An error has occured. Inbound document was not saved. Please try again later."
               open={notificationFail}
-              closeNotification={() => setnotificationFail(false)}
+              closeNotification={() => setNotificationFail(false)}
               close
             />
           </GridItem>
