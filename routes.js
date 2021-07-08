@@ -18,12 +18,6 @@
 // @material-ui/icons
 import Dashboard from "@material-ui/icons/Dashboard";
 import Person from "@material-ui/icons/Person";
-import LibraryBooks from "@material-ui/icons/LibraryBooks";
-import BubbleChart from "@material-ui/icons/BubbleChart";
-import LocationOn from "@material-ui/icons/LocationOn";
-import Notifications from "@material-ui/icons/Notifications";
-import Unarchive from "@material-ui/icons/Unarchive";
-import Language from "@material-ui/icons/Language";
 import HistoryIcon from "@material-ui/icons/History";
 import GroupIcon from "@material-ui/icons/Group";
 import AssignmentReturnedRoundedIcon from "@material-ui/icons/AssignmentReturnedRounded";
@@ -39,7 +33,7 @@ const dashboardRoutes = [
     layout: "/admin",
   },
   {
-    path: "/table-list",
+    path: "/activity-log",
     name: "Activity Logs",
     icon: HistoryIcon,
 
@@ -78,6 +72,24 @@ const dashboardRoutes = [
 
     layout: "/admin",
   },
+  // {
+  //   path: "/icons",
+  //   name: "Icons",
+  //   icon: AssignmentReturnedRoundedIcon,
+  //   layout: "/admin",
+  // },
+  // {
+  //   path: "/typography",
+  //   name: "Icons",
+  //   icon: AssignmentReturnedRoundedIcon,
+  //   layout: "/admin",
+  // },
+  // {
+  //   path: "/notifications",
+  //   name: "Notifications",
+  //   icon: AssignmentReturnedRoundedIcon,
+  //   layout: "/admin",
+  // },
 ];
 
 export default dashboardRoutes;
