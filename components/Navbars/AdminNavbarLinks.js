@@ -86,6 +86,7 @@ export default function AdminNavbarLinks(props) {
           </Hidden>
         </Button>
       </Link> */}
+      <p className={classes.searchWrapper}>Good morning, Cidrex!</p>
       <div className={classes.manager}>
         <Button
           color={size.width > 959 ? "transparent" : "white"}
