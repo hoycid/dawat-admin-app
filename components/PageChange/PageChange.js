@@ -46,10 +46,10 @@ export default function PageChange(props) {
           <p>
             {
               path === "/admin/dashboard" ? "Dashboard" :
-              path === "/admin/table-list" ? "Activity Logs" :
+              path === "/admin/activity-log" ? "Activity Log" :
               path === "/admin/user-profile" ? "User Profile" :
               path === "/admin/inbound" ? "Inbound Documents" :
-              path === "/admin/outboundbound" ? "Outbound Documents" :
+              path === "/admin/outbound" ? "Outbound Documents" :
               path === "/admin/settings" ? "Settings" :
               path === "/admin/inbound-sent" ? "Submitting Document" :
               path === "/admin/loading-dashboard-data" ? "Dashboard data" : ""
