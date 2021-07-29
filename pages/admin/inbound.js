@@ -46,9 +46,10 @@ import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
 
 import Image from 'next/image'
 
+import axios from "axios";
 import moment from "moment";
 
-import avatar from "assets/img/faces/marc.jpg";
+import defaultPhoto from "assets/img/default.jpg";
 
 const styles = {
   modal: {
@@ -95,25 +96,24 @@ function Inbound() {
   const [documentTypes, setDocumentTypes] = React.useState([]);
 
   const [loadingData, setLoadingData] = React.useState(true);
-  const [loadingInboundsFailed, setLoadingInboundsFailed] =
-    React.useState(false);
+  const [loadingInboundsFailed, setLoadingInboundsFailed] = React.useState(false);
 
   const [openAttachModal, setOpenAttachModal] = React.useState(false);
 
   const [notificationSuccess, setNotificationSuccess] = React.useState(false);
   const [notificationFail, setNotificationFail] = React.useState(false);
-  const [notificationIncomplete, setNotificationIncomplete] =
-    React.useState(false);
+  const [notificationIncomplete, setNotificationIncomplete] = React.useState(false);
+
+  const [selectedImage, setSelectedImage] = React.useState(null);
+  const [uploadedFile, setUploadedFile] = React.useState("");
 
   const [state, setState] = React.useState({
-    img: avatar,
+    img: defaultPhoto,
     type: "",
     sender: "",
     description: "",
     date: moment().format(),
   });
-
-  const inputRef = React.useRef();
 
   React.useEffect(() => {
     getData();
@@ -175,7 +175,7 @@ function Inbound() {
       const res = await response.json();
       if (res.success) {
         setState({
-          img: avatar,
+          img: defaultPhoto,
           type: "",
           sender: "",
           description: "",
@@ -192,18 +192,14 @@ function Inbound() {
     } else {
       showNotification("incomplete");
     }
-  }
+    handleCloseAttachModal();
+  };
 
   const handleOnChange = (name, value) => {
     setState({
       ...state,
       [name]: value,
     });
-  };
-
-  const handleChooseFile = () => {
-    const { current } = inputRef
-    (current || { click: () => {}}).click()
   };
 
   const handleOpenAttachModal = () => {
@@ -253,8 +249,43 @@ function Inbound() {
     }
   };
 
+  async function handleUploadFile() {
+    if (selectedImage) {
+      const form = new FormData();
+
+      form.append("media", selectedImage);
+  
+      // for (var [key, value] of form.entries()) {
+      //   console.log(key, value);
+      // }
+  
+      // const response = await fetch("/api/upload", {
+      //   method: "POST",
+      //   body: form,
+      // });
+  
+      await axios(`/api/upload`, {
+        method: "POST",
+        data: form,
+        "content-type": "multipart/form-data"
+      }).then((res) => {
+        setUploadedFile(res.data.media.path.toString());
+        console.log(uploadedFile);
+      })
+    } else {
+      showNotification("incomplete");
+      handleCloseAttachModal();
+    }
+  };
+
+  const handleChooseFile = e => {
+    setSelectedImage(e.target.files[0]);
+  };
+
   const useStyles = makeStyles(styles);
   const classes = useStyles();
+
+  const inputRef = React.useRef();
 
   return (
     <div>
@@ -496,28 +527,36 @@ function Inbound() {
                   </CardHeader>
                 </div>
                 <CardAvatar>
-                  <img src={state.img} alt={`${state.img}`} />
+                  <img src={state.img} alt="image" />
                 </CardAvatar>
                 <CardBody>
                   <input
-                    onChange={(e) => {
-                      e.stopPropagation();
-                      e.preventDefault();
-                      console.log( e.target.files[0].file)
-                      //handleOnChange("img", e.target.files[0].file);
-                    }}
-                    id="select-file"
                     type="file"
-                    ref={inputRef}
-                    style={{ display: "none" }}
+                    className="custom-file-input"
+                    id="customFile"
+                    multiple={true}
+                    onChange={handleChooseFile}
                   />
-                  <Button color="primary" onClick={handleChooseFile}>
-                    Browse file
+                  <Button
+                    color="primary"
+                    onClick={() => {
+                      !uploadedFile ? handleUploadFile() : handleSubmit(state);
+                    }}
+                  >
+                    {!uploadedFile ? "Upload" : "Submit"}
                   </Button>
                   <Button
                     color="primary"
                     onClick={() => {
-                      setState({ ...state, img: "" });
+                      setState({
+                        img: defaultPhoto,
+                        type: "",
+                        sender: "",
+                        description: "",
+                        date: moment().format(),
+                      });
+                      setSelectedImage(null);
+                      setUploadedFile("");
                       setOpenAttachModal(false);
                     }}
                   >
