@@ -23,6 +23,8 @@ import Router from "next/router";
 
 import PageChange from "components/PageChange/PageChange.js";
 
+import { Auth0Provider } from "@auth0/auth0-react";
+
 import "assets/css/nextjs-material-dashboard.css?v=1.1.0";
 
 Router.events.on("routeChangeStart", (url) => {
@@ -87,7 +89,13 @@ export default class MyApp extends App {
           {/* <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script> */}
         </Head>
         <Layout>
-          <Component {...pageProps} />
+          <Auth0Provider
+            domain="dev-uh0gg0-m.us.auth0.com"
+            clientId="8idiR8BfNYEKVSfex5yap5nBE3epyiGL"
+            redirectUri="https://pagro-admin-app.vercel.app/admin/dashboard"
+          >
+            <Component {...pageProps} />
+          </Auth0Provider>
         </Layout>
       </React.Fragment>
     );
