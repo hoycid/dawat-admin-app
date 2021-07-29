@@ -47,14 +47,14 @@ export default function Footer(props) {
                 className={classes.block}
               >
                 User Profile
-              </Link> */}
+              </Link> 
               <Link
                 href="/admin/settings"
                 onClick={(e) => e.preventDefault()}
                 className={classes.block}
               >
                 Settings
-              </Link>
+              </Link> */}
             </ListItem>
           </List>
         </div>
