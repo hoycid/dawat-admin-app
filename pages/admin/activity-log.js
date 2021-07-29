@@ -13,6 +13,11 @@ import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
+import Snackbar from "components/Snackbar/Snackbar.js";
+
+import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
+
+import moment from "moment";
 
 const styles = {
   cardCategoryWhite: {
@@ -117,12 +122,12 @@ function ActivityLog() {
                 ]}
                 tableData={data.map((doc) => [
                   doc._id,
-                  "SAMPLE Cidrex",
+                  "Cidrex",
                   doc.type,
                   doc.description,
                   doc.sender,
-                  "SAMPLE Emma Ravelo",
-                  doc.date,
+                  "Emma Ravelo",
+                  moment(doc.date).format("MM/DD/YYYY, hh:mm A"),
                 ])}
               />
             </CardBody>
@@ -169,6 +174,6 @@ function ActivityLog() {
   );
 }
 
-TableList.layout = Admin;
+ActivityLog.layout = Admin;
 
 export default ActivityLog;
