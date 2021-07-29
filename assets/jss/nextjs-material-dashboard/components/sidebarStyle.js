@@ -99,6 +99,7 @@ const sidebarStyle = (theme) => ({
     maxHeight: "30px",
     marginLeft: "10px",
     marginRight: "15px",
+    marginBottom: "25px"
   },
   img: {
     width: "35px",
