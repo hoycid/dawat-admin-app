@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 
 const InboundSchema = new mongoose.Schema({
+    img:
+    {
+        type: String,
+        required: [true, 'Missing image link!'],
+    },
     type: {
         type: String,
         required: [true, 'Missing type!'],
