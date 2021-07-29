@@ -26,12 +26,15 @@ import CardAvatar from "components/Card/CardAvatar.js";
 
 import Link from "next/link";
 
+import { useAuth0 } from "@auth0/auth0-react";
+
 import styles from "assets/jss/nextjs-material-dashboard/components/headerLinksStyle.js";
 
 export default function AdminNavbarLinks(props) {
   const size = useWindowSize();
   const useStyles = makeStyles(styles);
   const classes = useStyles();
+  const { logout } = useAuth0();
   const [openNotification, setOpenNotification] = React.useState(null);
   const [openProfile, setOpenProfile] = React.useState(null);
   const handleClickNotification = (event) => {
@@ -225,8 +228,8 @@ export default function AdminNavbarLinks(props) {
                     </Link>
                     <Divider light />
                     <MenuItem
-                      onClick={handleCloseProfile}
                       className={classes.dropdownItem}
+                      onClick={() => logout({ returnTo: window.location.origin })}
                     >
                       Logout
                     </MenuItem>
