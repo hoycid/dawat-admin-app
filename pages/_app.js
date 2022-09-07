@@ -86,7 +86,10 @@ export default class MyApp extends App {
             content="width=device-width, initial-scale=1, shrink-to-fit=no"
           />
           <title>PAGRO - Admin</title>
-          {/* <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script> */}
+          <script
+          src="https://widget.Cloudinary.com/v2.0/global/all.js"
+          type="text/javascript"
+          ></script>
         </Head>
         <Layout>
           <Auth0Provider

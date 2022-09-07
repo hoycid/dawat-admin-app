@@ -1,4 +1,4 @@
-import React from "react";
+import { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
 
 // @material-ui/core components
@@ -44,10 +44,7 @@ import DoneOutlineIcon from "@material-ui/icons/DoneOutline";
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
 
-import axios from "axios";
 import moment from "moment";
-
-import defaultPhoto from "assets/img/default.jpg";
 
 const styles = {
   modal: {
@@ -90,38 +87,30 @@ const styles = {
 };
 
 function Inbound() {
-  const [inboundDocs, setInboundDocs] = React.useState([]);
-  const [documentTypes, setDocumentTypes] = React.useState([]);
+  const [inboundDocs, setInboundDocs] = useState([]);
+  const [documentTypes, setDocumentTypes] = useState([]);
 
-  const [loadingData, setLoadingData] = React.useState(true);
-  const [loadingInboundsFailed, setLoadingInboundsFailed] =
-    React.useState(false);
+  const [loadingData, setLoadingData] = useState(true);
+  const [loadingInboundsFailed, setLoadingInboundsFailed] = useState(false);
 
-  const [openAttachModal, setOpenAttachModal] = React.useState(false);
+  const [openAttachModal, setOpenAttachModal] = useState(false);
 
-  const [notificationSuccess, setNotificationSuccess] = React.useState(false);
-  const [notificationFail, setNotificationFail] = React.useState(false);
-  const [notificationUploadSuccess, setNotificationUploadSuccess] =
-    React.useState(false);
-  const [notificationUploadFail, setNotificationUploadFail] =
-    React.useState(false);
-  const [notificationIncomplete, setNotificationIncomplete] =
-    React.useState(false);
+  const [notificationSuccess, setNotificationSuccess] = useState(false);
+  const [notificationFail, setNotificationFail] = useState(false);
+  const [notificationIncomplete, setNotificationIncomplete] = useState(false);
+  const [imagePublicId, setImagePublicId] = useState("");
 
-  const [selectedImage, setSelectedImage] = React.useState(null);
-  const [uploadedFile, setUploadedFile] = React.useState("");
-
-  const [state, setState] = React.useState({
-    img: defaultPhoto,
+  const [state, setState] = useState({
+    img: "",
     type: "",
     sender: "",
     description: "",
     date: moment().format(),
   });
 
-  const [receiver, setReceiver] = React.useState("user");
+  const [receiver, setReceiver] = useState("user");
 
-  React.useEffect(() => {
+  useEffect(() => {
     getData();
 
     const interval = setInterval(() => {
@@ -170,16 +159,16 @@ function Inbound() {
     }
   }
 
-  async function handleSubmit(details) {
-    if (details.type && details.sender) {
+  async function handleSubmit() {
+    if (state.type && state.sender) {
       document.body.classList.add("body-page-transition");
       ReactDOM.render(
         <PageChange path={"/admin/inbound-sent"} />,
         document.getElementById("page-transition")
       );
 
-      const data = { ...details, receiver: receiver };
-
+      const data = { ...state, receiver: receiver, img: imagePublicId };
+      console.log(data);
       const response = await fetch("/api/inbound", {
         method: "POST",
         body: JSON.stringify(data),
@@ -200,7 +189,7 @@ function Inbound() {
         const logRes = await logResponse.json();
         if (res.success && logRes.success) {
           setState({
-            img: defaultPhoto,
+            img: "",
             type: "",
             sender: "",
             description: "",
@@ -223,6 +212,25 @@ function Inbound() {
     }
     handleCloseAttachModal();
   }
+
+  const openWidget = () => {
+    // create the widget
+    const widget = window.cloudinary.createUploadWidget(
+      {
+        cloudName: "dwikose2e",
+        uploadPreset: "uf7aan88",
+      },
+      (error, result) => {
+        if (
+          result.event === "success" &&
+          result.info.resource_type === "image"
+        ) {
+          setImagePublicId(result.info.public_id);
+        }
+      }
+    );
+    widget.open(); // open up the widget after creation
+  };
 
   const handleOnChange = (name, value) => {
     setState({
@@ -294,47 +302,10 @@ function Inbound() {
     }
   };
 
-  async function handleUploadFile() {
-    if (selectedImage) {
-      const form = new FormData();
-
-      form.append("media", selectedImage);
-
-      // for (var [key, value] of form.entries()) {
-      //   console.log(key, value);
-      // }
-
-      // const response = await fetch("/api/upload", {
-      //   method: "POST",
-      //   body: form,
-      // });
-
-      await axios(`/api/upload`, {
-        method: "POST",
-        data: form,
-        "content-type": "multipart/form-data",
-      }).then(res => {
-        if (res.status === 201) {
-          setUploadedFile(res.data.media.path.toString());
-          showNotification("upload-success");
-        } else {
-          showNotification("upload-failed");
-        }
-      });
-    } else {
-      showNotification("incomplete");
-      handleCloseAttachModal();
-    }
-  }
-
-  const handleChooseFile = e => {
-    setSelectedImage(e.target.files[0]);
-  };
-
   const useStyles = makeStyles(styles);
   const classes = useStyles();
 
-  const inputRef = React.useRef();
+  const inputRef = useRef();
 
   return (
     <div>
@@ -544,24 +515,6 @@ function Inbound() {
             />
             <Snackbar
               place="br"
-              color="success"
-              icon={DoneOutlineIcon}
-              message="Image uploaded successfully!"
-              open={notificationUploadSuccess}
-              closeNotification={() => setNotificationUploadSuccess(false)}
-              close
-            />
-            <Snackbar
-              place="br"
-              color="danger"
-              icon={ErrorOutlineIcon}
-              message="Something went wrong. Image upload failed."
-              open={notificationUploadFail}
-              closeNotification={() => setNotificationUploadFail(false)}
-              close
-            />
-            <Snackbar
-              place="br"
               color="warning"
               icon={ErrorOutlineIcon}
               message="Please complete the required document details."
@@ -609,40 +562,24 @@ function Inbound() {
                     </p>
                   </CardHeader>
                 </div>
-                {/* <CardAvatar>
-                  <img src={uploadedFile || state.img} alt="image" />
-                </CardAvatar> */}
                 <CardBody>
-                  <input
-                    type="file"
-                    className="custom-file-input"
-                    id="customFile"
-                    multiple={true}
-                    onChange={handleChooseFile}
-                  />
                   <Button
-                    color="primary"
-                    disabled={selectedImage ? false : true}
-                    onClick={() => {
-                      // !uploadedFile ? handleUploadFile() : handleSubmit(state);
-                      handleSubmit(state);
-                    }}
+                    color={imagePublicId ? "success" : "primary"}
+                    onClick={imagePublicId ? handleSubmit : openWidget}
                   >
-                    {/* {!uploadedFile ? "Upload" : "Submit"} */}
-                    Submit
+                    {imagePublicId ? "Submit" : "Upload"}
                   </Button>
                   <Button
                     color="primary"
                     onClick={() => {
                       setState({
-                        img: defaultPhoto,
+                        img: "",
                         type: "",
                         sender: "",
                         description: "",
                         date: moment().format(),
                       });
-                      setSelectedImage(null);
-                      setUploadedFile("");
+                      setImagePublicId("");
                       setOpenAttachModal(false);
                     }}
                   >
