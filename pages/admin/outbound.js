@@ -22,6 +22,7 @@ import Chip from "@material-ui/core/Chip";
 import Table from "components/Table/Table.js";
 import TableClickable from "components/TableClickable/TableClickable.js";
 import PageChange from "components/PageChange/PageChange.js";
+import Snackbar from "components/Snackbar/Snackbar.js";
 
 import DateRange from "@material-ui/icons/DateRange";
 import LibraryBooks from "@material-ui/icons/LibraryBooks";
@@ -31,6 +32,8 @@ import RecordVoiceOverIcon from "@material-ui/icons/RecordVoiceOver";
 import SubjectTwoToneIcon from "@material-ui/icons/SubjectTwoTone";
 import ExitToAppTwoToneIcon from "@material-ui/icons/ExitToAppTwoTone";
 import RefreshIcon from "@material-ui/icons/Refresh";
+import DoneOutlineIcon from "@material-ui/icons/DoneOutline";
+import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 
 import moment from "moment";
 
@@ -74,7 +77,7 @@ function Outbound() {
     type: "",
     sender: "",
     description: "",
-    date: moment().format(),
+    date: "",
     receiver: "",
   });
 
@@ -293,29 +296,50 @@ function Outbound() {
                 <LibraryBooks style={{ fontSize: 100 }} />
               )}
             </CardAvatar>
-            <CardBody>
-              <Chip
-                icon={<DateRange />}
-                label={`${moment(selected.date).format("MM/DD/YYYY, hh:mm A")}`}
-              />
-              <Chip icon={<ExitToAppTwoToneIcon />} label="OUT" />
-              <h3 className={classes.cardTitle}>
-                {selected.type ? selected.type : "Document type"}
-              </h3>
-              <h4 className={classes.cardCategory}>
-                {selected.sender ? `${selected.sender}` : "Source"}
-              </h4>
-              <p className={classes.description}>
-                {selected.description
-                  ? selected.description
-                  : "Document description..."}
-              </p>
-              {!forwardInputVisible && (
-                <Button color="danger" onClick={toggleForwardInput}>
-                  Forward
-                </Button>
-              )}
-            </CardBody>
+            {selected.date ? (
+              <CardBody>
+                <Chip
+                  icon={<DateRange />}
+                  label={`${moment(selected.date).format(
+                    "MM/DD/YYYY, hh:mm A"
+                  )}`}
+                />
+                <Chip icon={<ExitToAppTwoToneIcon />} label="OUT" />
+                <h3 className={classes.cardTitle}>
+                  {selected.type ? selected.type : "Document type"}
+                </h3>
+                <h4 className={classes.cardCategory}>
+                  {selected.sender ? `${selected.sender}` : "Source"}
+                </h4>
+                <p className={classes.description}>
+                  {selected.description
+                    ? selected.description
+                    : "Document description..."}
+                </p>
+                {!forwardInputVisible && (
+                  <Button
+                    color="danger"
+                    onClick={toggleForwardInput}
+                    disabled={!selected.date}
+                  >
+                    Forward
+                  </Button>
+                )}
+              </CardBody>
+            ) : (
+              <CardBody>
+                <h2>Select a document</h2>
+                {!forwardInputVisible && (
+                  <Button
+                    color="danger"
+                    onClick={toggleForwardInput}
+                    disabled={!selected.date}
+                  >
+                    Forward
+                  </Button>
+                )}
+              </CardBody>
+            )}
             <CardFooter>
               {forwardInputVisible ? (
                 <div>
@@ -446,6 +470,37 @@ function Outbound() {
           </Card>
         </GridItem>
       </GridContainer>
+      <GridContainer justify={"center"}>
+          <GridItem xs={12} sm={12} md={3}>
+            <Snackbar
+              place="br"
+              color="success"
+              icon={DoneOutlineIcon}
+              message="Inbound document was processed successfully!"
+              open={notificationSuccess}
+              closeNotification={() => setNotificationSuccess(false)}
+              close
+            />
+            <Snackbar
+              place="br"
+              color="warning"
+              icon={ErrorOutlineIcon}
+              message="Please complete the required document details."
+              open={notificationIncomplete}
+              closeNotification={() => setNotificationIncomplete(false)}
+              close
+            />
+            <Snackbar
+              place="br"
+              color="danger"
+              icon={ErrorOutlineIcon}
+              message="Oops! Something went wrong. Please try again later."
+              open={notificationFail}
+              closeNotification={() => setNotificationFail(false)}
+              close
+            />
+          </GridItem>
+        </GridContainer>
     </div>
   );
 }
