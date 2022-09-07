@@ -60,19 +60,23 @@ function ActivityLog() {
   React.useEffect(() => {
     getData();
 
+    const interval = setInterval(() => {
+      getData();
+    }, 10000);
+
     return function cleanup() {
+      clearInterval(interval);
+
       // to stop the warning of calling setState of unmounted component
       var id = window.setTimeout(null, 0);
       while (id--) {
         window.clearTimeout(id);
       }
     };
-  }, [loadingData]);
+  }, []);
 
   async function getData() {
-    const data = [];
-    // inbounds fetch
-    const getInboundFetchResponse = await fetch("/api/inbound", {
+    const response = await fetch("/api/log", {
       method: "GET",
       body: JSON.stringify(),
       headers: {
@@ -80,29 +84,11 @@ function ActivityLog() {
       },
     });
 
-    const getInboundResponse = await getInboundFetchResponse.json();
-    if (getInboundResponse.success) {
-      data.push(...getInboundResponse.data);
+    const res = await response.json();
+    if (res.success) {
+      setData(res.data);
     } else {
-      showNotification("loadingInboundsFailed");
-    }
-
-    //outbounds fetch
-    const getOutboundFetchResponse = await fetch("/api/outbound", {
-      method: "GET",
-      body: JSON.stringify(),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    const getOutboundResponse = await getOutboundFetchResponse.json();
-    if (getOutboundResponse.success) {
-      data.push(...getOutboundResponse.data);
-      setData(data.sort((a, b) => new Date(b.date) - new Date(a.date)));
-      setLoadingData(false);
-    } else {
-      showNotification("loadingOutboundsFailed");
+      showFailedNotification();
     }
   }
 
@@ -114,7 +100,7 @@ function ActivityLog() {
       }, 4000);
     }
   };
-  
+
   return (
     <div>
       <GridContainer>
@@ -142,8 +128,8 @@ function ActivityLog() {
                   doc._id,
                   doc.type,
                   doc.sender,
-                  doc.recipient,
-                  doc.description,
+                  doc.recipient || "To Be Assigned",
+                  doc.description || "No description",
                   moment(doc.date).format("MM/DD/YYYY, hh:mm A"),
                   doc.receiver,
                 ])}

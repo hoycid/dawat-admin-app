@@ -189,18 +189,32 @@ function Inbound() {
       });
       const res = await response.json();
       if (res.success) {
-        setState({
-          img: defaultPhoto,
-          type: "",
-          sender: "",
-          description: "",
-          date: moment().format(),
+        const logResponse = await fetch("/api/log", {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: {
+            "Content-Type": "application/json",
+          },
         });
+
+        const logRes = await logResponse.json();
+        if (res.success && logRes.success) {
+          setState({
+            img: defaultPhoto,
+            type: "",
+            sender: "",
+            description: "",
+            date: moment().format(),
+          });
+          showNotification("success");
+        } else {
+          showNotification("failed");
+        }
+
         ReactDOM.unmountComponentAtNode(
           document.getElementById("page-transition")
         );
         document.body.classList.remove("body-page-transition");
-        showNotification("success");
       } else {
         showNotification("failed");
       }

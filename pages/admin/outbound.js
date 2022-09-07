@@ -154,7 +154,7 @@ function Outbound() {
         <PageChange path={"/admin/outbound-sent"} />,
         document.getElementById("page-transition")
       );
-      const data = { ...selected, recipient };
+      const data = { ...selected, recipient, date: moment().format() };
 
       const postResponse = await fetch("/api/outbound", {
         method: "POST",
@@ -164,15 +164,8 @@ function Outbound() {
         },
       });
       const postResult = await postResponse.json();
-      if (postResult.success) {
-        setSelected({
-          img: defaultPhoto,
-          type: "",
-          sender: "",
-          description: "",
-          date: moment().format(),
-        });
 
+      if (postResult.success) {
         const deleteResponse = await fetch("/api/inbound", {
           method: "DELETE",
           body: JSON.stringify(selected._id),
@@ -181,19 +174,32 @@ function Outbound() {
           },
         });
 
-        const deletResult = await deleteResponse.json();
+        const deleteResult = await deleteResponse.json();
+        const logResponse = await fetch("/api/log", {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-        if (postResult.success && deletResult.success) {
+        const logRes = await logResponse.json();
+        if (postResult.success && deleteResult.success && logRes.success) {
+          setSelected({
+            img: defaultPhoto,
+            type: "",
+            sender: "",
+            description: "",
+            date: moment().format(),
+          });
           setInboundDocs(inboundDocs.filter(doc => doc._id !== selected._id));
+
+          toggleForwardInput();
+          setRecipient("");
           showNotification("success");
         } else {
           showNotification("failed");
         }
-
-        toggleForwardInput();
-        setRecipient("");
-      } else {
-        showNotification("failed");
       }
     } else {
       showNotification("incomplete");
