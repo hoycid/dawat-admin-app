@@ -226,9 +226,9 @@ export default function AdminNavbarLinks(props) {
                     <Divider light />
                     <MenuItem
                       className={classes.dropdownItem}
-                      onClick={() =>
-                        logout({ returnTo: window.location.origin })
-                      }
+                      // onClick={() =>
+                      //   logout({ returnTo: window.location.origin })
+                      // }
                     >
                       Logout
                     </MenuItem>
