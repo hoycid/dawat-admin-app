@@ -339,7 +339,11 @@ function Inbound() {
   return (
     <div>
       <GridContainer>
-        <GridItem xs={12} sm={12} md={6}>
+        <GridItem
+          xs={12}
+          sm={12}
+          md={state.type || state.description || state.sender ? 8 : 12}
+        >
           <Card>
             <CardHeader color="primary">
               <h4 className={classes.cardTitleWhite}>Inbound Document</h4>
@@ -450,36 +454,44 @@ function Inbound() {
             </CardFooter>
           </Card>
         </GridItem>
-        <GridItem xs={12} sm={12} md={4}>
-          <Card profile>
-            <div
-              style={{ paddingBottom: 20, paddingTop: 20, textAlign: "Center" }}
-            >
-              Preview
-            </div>
-            <CardAvatar style={{ color: "#942bae" }}>
-              <SubjectTwoToneIcon style={{ fontSize: 100 }} />
-            </CardAvatar>
-            <CardBody>
-              <Chip
-                icon={<DateRange />}
-                label={`${moment(state.date).format("MM/DD/YYYY, hh:mm A")}`}
-              />
-              <Chip icon={<AssignmentReturnedRoundedIcon />} label="IN" />
-              <h3 className={classes.cardTitle}>
-                {state.type ? state.type : "Document type"}
-              </h3>
-              <h4 className={classes.cardCategory}>
-                {state.sender ? `${state.sender}` : "Source"}
-              </h4>
-              <p className={classes.description}>
-                {state.description
-                  ? state.description
-                  : "Document description..."}
-              </p>
-            </CardBody>
-          </Card>
-        </GridItem>
+        {state.sender || state.type || state.description ? (
+          <GridItem xs={12} sm={12} md={4}>
+            <Card profile>
+              <div
+                style={{
+                  paddingBottom: 20,
+                  paddingTop: 20,
+                  textAlign: "Center",
+                }}
+              >
+                Preview
+              </div>
+              <CardAvatar style={{ color: "#942bae" }}>
+                <SubjectTwoToneIcon style={{ fontSize: 100 }} />
+              </CardAvatar>
+              <CardBody>
+                <Chip
+                  icon={<DateRange />}
+                  label={`${moment(state.date).format("MM/DD/YYYY, hh:mm A")}`}
+                />
+                <Chip icon={<AssignmentReturnedRoundedIcon />} label="IN" />
+                <h3 className={classes.cardTitle}>
+                  {state.type ? state.type : "Document type"}
+                </h3>
+                <h4 className={classes.cardCategory}>
+                  {state.sender ? `${state.sender}` : "Source"}
+                </h4>
+                <p className={classes.description}>
+                  {state.description
+                    ? state.description
+                    : "Document description..."}
+                </p>
+              </CardBody>
+            </Card>
+          </GridItem>
+        ) : (
+          ""
+        )}
       </GridContainer>
       <GridContainer>
         <GridItem xs={12} sm={12} md={12}>
@@ -561,7 +573,7 @@ function Inbound() {
               place="br"
               color="danger"
               icon={ErrorOutlineIcon}
-              message="Oops! An error has occured. Inbound document was not saved. Please try again later."
+              message="Oops! Something went wrong. Please try again later."
               open={notificationFail}
               closeNotification={() => setNotificationFail(false)}
               close
