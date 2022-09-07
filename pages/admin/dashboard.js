@@ -34,10 +34,7 @@ import Snackbar from "components/Snackbar/Snackbar.js";
 import Link from "next/link";
 import moment from "moment";
 
-import {
-  server,
-  serverIdArr,
-} from "variables/general.js";
+import { server, serverIdArr } from "variables/general.js";
 
 // import {
 //   dailySalesChart,
@@ -55,29 +52,19 @@ function Dashboard() {
   const [documentTypes, setDocumentTypes] = React.useState([]);
 
   const [loadingData, setLoadingData] = React.useState(true);
-  const [loadingInboundsFailed, setLoadingInboundsFailed] = React.useState(false);
+  const [loadingInboundsFailed, setLoadingInboundsFailed] =
+    React.useState(false);
 
-  const [stats, setStats] = React.useState({
-    totalInboundToday: undefined,
-    totalInbound: undefined,
-    totalOutboundToday: undefined,
-    totalOutbound: undefined,
-    provinceMemos: undefined,
-    officeMemos: undefined,
-    endorsements: undefined,
-    meetingWorkshopSeminars: undefined,
-    businessCorrespondence: undefined,
-    privateBusinessCorrespondence: undefined,
-    requests: undefined,
-  });
-
-  const currentDate = moment(new Date());
-  
   React.useEffect(() => {
     getData();
-    getStats();
-    
+    const interval = setInterval(() => {
+      getData();
+      console.log("Refreshing");
+    }, 10000);
+
     return function cleanup() {
+      clearInterval(interval);
+
       // to stop the warning of calling setState of unmounted component
       var id = window.setTimeout(null, 0);
       while (id--) {
@@ -87,6 +74,7 @@ function Dashboard() {
   }, [loadingData]);
 
   async function getData() {
+    // inbounds fetch
     const getInboundFetchResponse = await fetch("/api/inbound", {
       method: "GET",
       body: JSON.stringify(),
@@ -94,6 +82,29 @@ function Dashboard() {
         "Content-Type": "application/json",
       },
     });
+
+    const getInboundResponse = await getInboundFetchResponse.json();
+    if (getInboundResponse.success) {
+      setInboundDocs(getInboundResponse.data);
+    } else {
+      showNotification("loadingInboundsFailed");
+    }
+
+    //outbounds fetch
+    const getOutboundFetchResponse = await fetch("/api/outbound", {
+      method: "GET",
+      body: JSON.stringify(),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const getOutboundResponse = await getOutboundFetchResponse.json();
+    if (getOutboundResponse.success) {
+      setOutboundDocs(getOutboundResponse.data);
+    } else {
+      showNotification("loadingOutboundsFailed");
+    }
 
     const getDocumentTypesFetchResponse = await fetch("/api/types", {
       method: "GET",
@@ -106,65 +117,11 @@ function Dashboard() {
     const getDocumentTypesResponse = await getDocumentTypesFetchResponse.json();
     if (getDocumentTypesResponse.success) {
       setDocumentTypes(getDocumentTypesResponse.data);
-    }
-
-    const getInboundResponse = await getInboundFetchResponse.json();
-    if (getInboundResponse.success) {
-      setInboundDocs(getInboundResponse.data);
       setLoadingData(false);
-    } else {
-      showNotification("loadingInboundsFailed");
     }
   }
 
-  const getStats = () => {
-    if (inboundDocs) {
-      const totalInboundProvincialMemo = inboundDocs.filter(
-        (doc) => doc.type === "Provincial Memo"
-      );
-      const totalInboundOfficeMemo = inboundDocs.filter(
-        (doc) => doc.type === "Office Memo"
-      );
-      const totalInboundEndorsement = inboundDocs.filter(
-        (doc) => doc.type === "Endorsement"
-      );
-      const totalInboundMeetingWorkshopSeminar = inboundDocs.filter(
-        (doc) =>
-          doc.type === "Meeting/Workshop/Seminar"
-      );
-      const totalInboundBusinessCorrespondence = inboundDocs.filter(
-        (doc) => doc.type === "Business Correspondence"
-      );
-      const totalInboundPrivateBusinessCorrespondence = inboundDocs.filter(
-        (doc) => doc.type === "Private Business Correspondence"
-      );
-      const totalInboundRequest = inboundDocs.filter(
-        (doc) => doc.type === "Request"
-      );
-
-      // set stats in the span of 3 weeks
-      setStats({
-        totalInboundToday: inboundDocs.filter(
-          (doc) =>
-            moment(doc.date).format("MM/DD/YYYY") ===
-            moment().format("MM/DD/YYYY")
-        ).length,
-        totalInbound: inboundDocs.length,
-        totalOutboundToday: outboundDocs.length,
-        totalOutbound: outboundDocs.length,
-        provinceMemos: totalInboundProvincialMemo.length,
-        officeMemos: totalInboundOfficeMemo.length,
-        endorsements: totalInboundEndorsement.length,
-        meetingWorkshopSeminars: totalInboundMeetingWorkshopSeminar.length,
-        businessCorrespondence: totalInboundBusinessCorrespondence.length,
-        privateBusinessCorrespondence:
-          totalInboundPrivateBusinessCorrespondence.length,
-        requests: totalInboundRequest.length,
-      });
-    }
-  };
-
-  const showNotification = (type) => {
+  const showNotification = type => {
     switch (type) {
       case "loadingInboundsFailed":
         if (!loadingInboundsFailed) {
@@ -190,27 +147,15 @@ function Dashboard() {
               </CardIcon>
               <p className={classes.cardCategory}>INBOUND DOCUMENTS</p>
               <h3 className={classes.cardTitle}>
-                {stats.totalInboundToday
-                  ? stats.totalInboundToday
-                  : stats.totalInboundToday === 0
-                  ? "0"
-                  : "--"}{" "}
-                <small>out of</small>{" "}
-                {stats.totalInbound
-                  ? stats.totalInbound
-                  : stats.totalInbound === 0
-                  ? "0"
-                  : "--"}
+                {inboundDocs.length > 0 ? inboundDocs.length : "0"}
               </h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
-                <Link href="/admin/inbound" onClick={(e) => e.preventDefault()}>
-                  <div>
-                    <HelpOutlineIcon />
-                    Click here to process an inbound document.
-                  </div>
-                </Link>
+                <div>
+                  <HelpOutlineIcon />
+                  Shown is the total pending inbound documents.
+                </div>
               </div>
             </CardFooter>
           </Card>
@@ -223,30 +168,29 @@ function Dashboard() {
               </CardIcon>
               <p className={classes.cardCategory}>OUTBOUND DOCUMENTS</p>
               <h3 className={classes.cardTitle}>
-                {stats.totalOutboundToday
-                  ? stats.totalOutboundToday
-                  : stats.totalOutboundToday === 0
-                  ? "0"
-                  : "--"}{" "}
+                {outboundDocs.filter(
+                  doc =>
+                    moment(doc.date).format("MM/DD/YYYY") ===
+                    moment().format("MM/DD/YYYY")
+                ).length > 0
+                  ? outboundDocs.filter(
+                      doc =>
+                        moment(doc.date).format("MM/DD/YYYY") ===
+                        moment().format("MM/DD/YYYY")
+                    ).length
+                  : "0"}{" "}
                 <small>out of</small>{" "}
-                {stats.totalOutbound
-                  ? stats.totalOutbound
-                  : stats.totalOutbound === 0
-                  ? "0"
-                  : "--"}
+                {outboundDocs.length > 0 ? outboundDocs.length : "0"}
               </h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
-                <Link
-                  href="/admin/outbound"
-                  onClick={(e) => e.preventDefault()}
-                >
-                  <div>
-                    <HelpOutlineIcon />
-                    Click here to process and designate an outbound document.
-                  </div>
-                </Link>
+                <div>
+                  <HelpOutlineIcon />
+                  Shown is the total processed outbound documents in the span of
+                  3 weeks compared to the overall total outbound documents
+                  recieved in the last 3 months.
+                </div>
               </div>
             </CardFooter>
           </Card>
@@ -258,7 +202,7 @@ function Dashboard() {
               return (
                 <GridItem xs={12} sm={6} md={4} key={index}>
                   <Card>
-                    <CardHeader color={type.color} icon>
+                    <CardHeader icon>
                       <CardIcon color={type.color}>
                         {typeof type.icon === "string" ? (
                           <Icon>{type.icon}</Icon>
@@ -269,27 +213,108 @@ function Dashboard() {
                       <p className={classes.cardCategory}>{type.name}</p>
                       <h3 className={classes.cardTitle}>
                         {type.name === "Provincial Memo"
-                          ? stats.provinceMemos
+                          ? inboundDocs.filter(
+                              doc => doc.type === "Provincial Memo"
+                            ).length
                           : type.name === "Office Memo"
-                          ? stats.officeMemos
+                          ? inboundDocs.filter(
+                              doc => doc.type === "Office Memo"
+                            ).length
                           : type.name === "Endorsement"
-                          ? stats.endorsements
+                          ? inboundDocs.filter(
+                              doc => doc.type === "Endorsement"
+                            ).length
                           : type.name === "Meeting/Workshop/Seminar"
-                          ? stats.meetingWorkshopSeminars
+                          ? inboundDocs.filter(
+                              doc => doc.type === "Meeting/Workshop/Seminar"
+                            ).length
                           : type.name === "Business Correspondence"
-                          ? stats.businessCorrespondence
+                          ? inboundDocs.filter(
+                              doc => doc.type === "Business Correspondence"
+                            ).length
                           : type.name === "Private Business Correspondence"
-                          ? stats.businessCorrespondence
+                          ? inboundDocs.filter(
+                              doc =>
+                                doc.type === "Private Business Correspondence"
+                            ).length
                           : type.name === "Request"
-                          ? stats.requests
-                          : "0"}{" "}
-                        <small>received</small>
+                          ? inboundDocs.filter(doc => doc.type === "Request")
+                              .length
+                          : ""}
                       </h3>
                     </CardHeader>
                     <CardFooter stats>
                       <div className={classes.stats}>
                         <DateRange />
-                        For the last 3 weeks
+                        {type.name === "Provincial Memo"
+                          ? inboundDocs.filter(
+                              doc => doc.type === "Provincial Memo"
+                            ).length > 0
+                            ? moment(
+                                inboundDocs.filter(
+                                  doc => doc.type === "Provincial Memo"
+                                )[0].date
+                              ).fromNow()
+                            : "No recent documents"
+                          : type.name === "Office Memo"
+                          ? inboundDocs.filter(
+                              doc => doc.type === "Office Memo"
+                            ).length > 0
+                            ? moment(
+                                inboundDocs.filter(
+                                  doc => doc.type === "Office Memo"
+                                )[0].date
+                              ).fromNow()
+                            : "No recent documents"
+                          : type.name === "Endorsement"
+                          ? inboundDocs.filter(
+                              doc => doc.type === "Endorsement"
+                            ).length > 0
+                            ? moment(
+                                inboundDocs.filter(
+                                  doc => doc.type === "Endorsement"
+                                )[0].date
+                              ).fromNow()
+                            : "No recent documents"
+                          : type.name === "Meeting/Workshop/Seminar"
+                          ? inboundDocs.filter(
+                              doc => doc.type === "Meeting/Workshop/Seminar"
+                            ).length > 0
+                            ? moment(
+                                inboundDocs.filter(
+                                  doc => doc.type === "Meeting/Workshop/Seminar"
+                                )[0].date
+                              ).fromNow()
+                            : "No recent documents"
+                          : type.name === "Business Correspondence"
+                          ? inboundDocs.filter(
+                              doc => doc.type === "Business Correspondence"
+                            ).length > 0
+                            ? moment(
+                                inboundDocs.filter(
+                                  doc => doc.type === "Business Correspondence"
+                                )[0].date
+                              ).fromNow()
+                            : "No recent documents"
+                          : type.name === "Private Business Correspondence"
+                          ? inboundDocs.filter(
+                              doc =>
+                                doc.type === "Private Business Correspondence"
+                            ).length > 0
+                            ? moment(
+                                privateBusinessCorrespondence[0].date
+                              ).fromNow()
+                            : "No recent documents"
+                          : type.name === "Request"
+                          ? inboundDocs.filter(doc => doc.type === "Request")
+                              .length > 0
+                            ? moment(
+                                inboundDocs.filter(
+                                  doc => doc.type === "Request"
+                                )[0].date
+                              ).fromNow()
+                            : "No recent documents"
+                          : "0"}
                       </div>
                     </CardFooter>
                   </Card>
@@ -299,9 +324,9 @@ function Dashboard() {
           : ""}
       </GridContainer>
       <GridContainer>
-        <GridItem xs={12} sm={12} md={6}>
+        <GridItem xs={12} sm={12} md={12}>
           <CustomTabs
-            title="Processing Feed:"
+            title="Activity Feed:"
             headerColor="dark"
             tabs={[
               {
@@ -310,13 +335,14 @@ function Dashboard() {
                 tabContent: (
                   <Documents
                     indexes={inboundDocs.map((doc, index) => index)}
-                    dates={inboundDocs.map((doc) => 
-                      moment(doc.date).fromNow()
-                    )}
-                    types={inboundDocs.map((doc) => doc.type)}
-                    descriptions={inboundDocs.map((doc) =>
+                    dates={inboundDocs.map(doc => moment(doc.date).fromNow())}
+                    id={inboundDocs.map(doc => doc._id)}
+                    senders={inboundDocs.map(doc => doc.sender)}
+                    types={inboundDocs.map(doc => doc.type)}
+                    descriptions={inboundDocs.map(doc =>
                       doc.description ? doc.description : "No description"
                     )}
+                    receivers={inboundDocs.map(doc => doc.receiver)}
                   />
                 ),
               },
@@ -325,54 +351,20 @@ function Dashboard() {
                 tabIcon: ExitToAppTwoToneIcon,
                 tabContent: (
                   <Documents
-                    indexes={inboundDocs.map((doc, index) => index)}
-                    dates={inboundDocs.map((doc) =>
-                      moment(doc.date).format("hh:mm A")
-                    )}
-                    types={inboundDocs.map((doc) => doc.type)}
-                    descriptions={inboundDocs.map((doc) =>
+                    indexes={outboundDocs.map((doc, index) => index)}
+                    dates={outboundDocs.map(doc => moment(doc.date).fromNow())}
+                    id={outboundDocs.map(doc => doc._id)}
+                    senders={outboundDocs.map(doc => doc.sender)}
+                    types={outboundDocs.map(doc => doc.type)}
+                    descriptions={outboundDocs.map(doc =>
                       doc.description ? doc.description : "No description"
                     )}
+                    receivers={outboundDocs.map(doc => doc.receiver)}
                   />
                 ),
               },
             ]}
           />
-        </GridItem>
-        <GridItem xs={12} sm={12} md={6}>
-          <Card>
-            <CardHeader color="warning">
-              <h4 className={classes.cardTitleWhite}>Document Designations</h4>
-              <p className={classes.cardCategoryWhite}>
-                Documents forwarded to persons concerned.
-                <small>For the last 3 weeks</small>
-              </p>
-            </CardHeader>
-            <CardBody>
-              <Table
-                tableHeaderColor="warning"
-                tableHead={["ID", "Type", "Designated", "Date", "Time"]}
-                tableData={[
-                  ["x0948", "Memo", "Emma Ravelo", "6/16/2021", "11:24AM"],
-                  [
-                    "x0949",
-                    "Communication",
-                    "Richel Tilanduca",
-                    "6/16/2021",
-                    "10:05AM",
-                  ],
-                  [
-                    "x0950",
-                    "Recommendation",
-                    "Lilith Turan",
-                    "6/16/2021",
-                    "9:55AM",
-                  ],
-                  ["x0948", "Memo", "Richel Tilanduca", "6/15/2021", "3:30PM"],
-                ]}
-              />
-            </CardBody>
-          </Card>
         </GridItem>
         <GridContainer justify={"center"}>
           <GridItem xs={12} sm={12} md={3}>

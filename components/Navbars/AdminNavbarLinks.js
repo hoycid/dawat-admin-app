@@ -37,7 +37,7 @@ export default function AdminNavbarLinks(props) {
   const { logout } = useAuth0();
   const [openNotification, setOpenNotification] = React.useState(null);
   const [openProfile, setOpenProfile] = React.useState(null);
-  const handleClickNotification = (event) => {
+  const handleClickNotification = event => {
     if (openNotification && openNotification.contains(event.target)) {
       setOpenNotification(null);
     } else {
@@ -47,7 +47,7 @@ export default function AdminNavbarLinks(props) {
   const handleCloseNotification = () => {
     setOpenNotification(null);
   };
-  const handleClickProfile = (event) => {
+  const handleClickProfile = event => {
     if (openProfile && openProfile.contains(event.target)) {
       setOpenProfile(null);
     } else {
@@ -89,7 +89,7 @@ export default function AdminNavbarLinks(props) {
           </Hidden>
         </Button>
       </Link> */}
-      <p className={classes.searchWrapper}>Good morning, Cidrex!</p>
+      <p className={classes.searchWrapper}>Good morning, user!</p>
       <div className={classes.manager}>
         <Button
           color={size.width > 959 ? "transparent" : "white"}
@@ -138,10 +138,7 @@ export default function AdminNavbarLinks(props) {
                       <GridContainer>
                         <GridItem xs={12} sm={2} md={2}>
                           <CardAvatar notif>
-                            <a
-                              href="#pablo"
-                              onClick={(e) => e.preventDefault()}
-                            >
+                            <a href="#pablo" onClick={e => e.preventDefault()}>
                               <img src={""} alt="..." />
                             </a>
                           </CardAvatar>
@@ -149,12 +146,12 @@ export default function AdminNavbarLinks(props) {
                         <GridItem xs={12} sm={6} md={6}>
                           <GridContainer>
                             <GridItem xs={12} sm={6} md={6}>
-                              Cidrex Quilang - Administrative Aide I
+                              user - position
                             </GridItem>
                           </GridContainer>
                           <GridContainer>
                             <GridItem xs={12} sm={6} md={6}>
-                              Processed an inbound document 1 minute ago
+                              Processed an inbound document x minute ago
                             </GridItem>
                           </GridContainer>
                           <GridContainer>
@@ -229,7 +226,9 @@ export default function AdminNavbarLinks(props) {
                     <Divider light />
                     <MenuItem
                       className={classes.dropdownItem}
-                      onClick={() => logout({ returnTo: window.location.origin })}
+                      onClick={() =>
+                        logout({ returnTo: window.location.origin })
+                      }
                     >
                       Logout
                     </MenuItem>

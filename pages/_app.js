@@ -90,8 +90,8 @@ export default class MyApp extends App {
         </Head>
         <Layout>
           <Auth0Provider
-            domain="dev-uh0gg0-m.us.auth0.com"
-            clientId="8idiR8BfNYEKVSfex5yap5nBE3epyiGL"
+            domain="dev-pboqmq8p.auth0.com"
+            clientId="plE9ZH5vQSyCSGzTISMph1ZWN3PRxq3c"
             redirectUri="https://pagro-admin-app.vercel.app/admin/dashboard"
           >
             <Component {...pageProps} />

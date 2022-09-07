@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const InboundSchema = new mongoose.Schema({
+const OutboundSchema = new mongoose.Schema({
   img: {
     type: String,
     required: [true, "Missing image link!"],
@@ -17,17 +17,20 @@ const InboundSchema = new mongoose.Schema({
   },
   description: {
     type: String,
-    required: [false],
     maxLength: [200, "Description must be less than 400 characters!"],
   },
   date: {
     type: String,
-    required: [true, "Missing sender!"],
+    required: [true, "Missing date!"],
   },
   receiver: {
     type: String,
   },
+  recipient: {
+    type: String,
+    required: [true, "Missing recipient!"],
+  },
 });
 
 module.exports =
-  mongoose.models.Inbound || mongoose.model("Inbound", InboundSchema);
+  mongoose.models.Outbound || mongoose.model("Outbound", OutboundSchema);

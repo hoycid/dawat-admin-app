@@ -13,6 +13,8 @@ import CardAvatar from "components/Card/CardAvatar.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 
+import Link from "next/link";
+
 import logo from "assets/img/pgblogo.png";
 
 import { useAuth0 } from "@auth0/auth0-react";
@@ -104,7 +106,8 @@ function LoginPage() {
                   />
                 </GridItem>
               </GridContainer>
-                <Button color="success" onClick={() => loginWithRedirect()}>Login</Button>
+                {/* <Button color="success" onClick={() => loginWithRedirect()}>Login</Button> */}
+                <Link href="/admin/dashboard" onClick={(e) => e.preventDefault()}>Login</Link>
               <CardFooter>
                 Forgot password?
               </CardFooter>

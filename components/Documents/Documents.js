@@ -21,54 +21,23 @@ import styles from "assets/jss/nextjs-material-dashboard/components/tasksStyle.j
 export default function Documents(props) {
   const useStyles = makeStyles(styles);
   const classes = useStyles();
-  const { indexes, dates, types, descriptions } = props;
+  const { indexes, dates, id, receivers, senders, types, descriptions } = props;
   const tableCellClasses = classnames(classes.tableCell);
 
   return (
     <Table className={classes.table}>
       <TableBody>
-        {indexes.map((value) => (
+        {indexes.map(value => (
           <TableRow key={value} className={classes.tableRow}>
             <TableCell className={tableCellClasses}>{dates[value]}</TableCell>
+            <TableCell className={tableCellClasses}>{id[value]}</TableCell>
+            <TableCell className={tableCellClasses}>{senders[value]}</TableCell>
             <TableCell className={tableCellClasses}>{types[value]}</TableCell>
             <TableCell className={tableCellClasses}>
               {descriptions[value]}
             </TableCell>
-            <TableCell className={classes.tableActions}>
-              <Tooltip
-                id="tooltip-top"
-                title="Edit Task"
-                placement="top"
-                classes={{ tooltip: classes.tooltip }}
-              >
-                <IconButton
-                  aria-label="Edit"
-                  className={classes.tableActionButton}
-                >
-                  <Edit
-                    className={
-                      classes.tableActionButtonIcon + " " + classes.edit
-                    }
-                  />
-                </IconButton>
-              </Tooltip>
-              <Tooltip
-                id="tooltip-top-start"
-                title="Remove"
-                placement="top"
-                classes={{ tooltip: classes.tooltip }}
-              >
-                <IconButton
-                  aria-label="Close"
-                  className={classes.tableActionButton}
-                >
-                  <Close
-                    className={
-                      classes.tableActionButtonIcon + " " + classes.close
-                    }
-                  />
-                </IconButton>
-              </Tooltip>
+            <TableCell className={tableCellClasses}>
+              {receivers[value]}
             </TableCell>
           </TableRow>
         ))}

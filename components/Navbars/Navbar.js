@@ -24,7 +24,7 @@ export default function Header(props) {
   const classes = useStyles();
   function makeBrand() {
     var name = "NextJS Material Dashboard";
-    props.routes.map((prop) => {
+    props.routes.map(prop => {
       if (router.route.indexOf(prop.layout + prop.path) !== -1) {
         name = prop.name;
       }

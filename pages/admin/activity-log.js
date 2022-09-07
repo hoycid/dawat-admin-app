@@ -55,8 +55,7 @@ function ActivityLog() {
 
   const [data, setData] = React.useState([]);
   const [loadingData, setLoadingData] = React.useState(true);
-  const [loadingDataFailed, setLoadingDataFailed] =
-    React.useState(false);
+  const [loadingDataFailed, setLoadingDataFailed] = React.useState(false);
 
   React.useEffect(() => {
     getData();
@@ -72,6 +71,7 @@ function ActivityLog() {
 
   async function getData() {
     const data = [];
+    // inbounds fetch
     const getInboundFetchResponse = await fetch("/api/inbound", {
       method: "GET",
       body: JSON.stringify(),
@@ -82,11 +82,27 @@ function ActivityLog() {
 
     const getInboundResponse = await getInboundFetchResponse.json();
     if (getInboundResponse.success) {
-      data.push(getInboundResponse.data);
-      setData(...data);
+      data.push(...getInboundResponse.data);
+    } else {
+      showNotification("loadingInboundsFailed");
+    }
+
+    //outbounds fetch
+    const getOutboundFetchResponse = await fetch("/api/outbound", {
+      method: "GET",
+      body: JSON.stringify(),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const getOutboundResponse = await getOutboundFetchResponse.json();
+    if (getOutboundResponse.success) {
+      data.push(...getOutboundResponse.data);
+      setData(data.sort((a, b) => new Date(b.date) - new Date(a.date)));
       setLoadingData(false);
     } else {
-      showFailedNotification();
+      showNotification("loadingOutboundsFailed");
     }
   }
 
@@ -98,7 +114,7 @@ function ActivityLog() {
       }, 4000);
     }
   };
-
+  
   return (
     <div>
       <GridContainer>
@@ -112,46 +128,25 @@ function ActivityLog() {
               <Table
                 tableHeaderColor="primary"
                 tableHead={[
+                  "Category",
                   "ID",
-                  "Reciever",
                   "Type",
-                  "Description",
                   "Sender",
                   "Recipient",
+                  "Description",
                   "Date",
+                  "Reciever",
                 ]}
-                tableData={data.map((doc) => [
+                tableData={data.map(doc => [
+                  doc.recipient ? "Outbound" : "Inbound",
                   doc._id,
-                  "Cidrex",
                   doc.type,
-                  doc.description,
                   doc.sender,
-                  "Emma Ravelo",
+                  doc.recipient,
+                  doc.description,
                   moment(doc.date).format("MM/DD/YYYY, hh:mm A"),
+                  doc.receiver,
                 ])}
-              />
-            </CardBody>
-          </Card>
-        </GridItem>
-        <GridItem xs={12} sm={12} md={12}>
-          <Card plain>
-            <CardHeader plain color="primary">
-              <h4 className={classes.cardTitleWhite}>Documents Kept</h4>
-              <p className={classes.cardCategoryWhite}>For the last 3 months</p>
-            </CardHeader>
-            <CardBody>
-              <Table
-                tableHeaderColor="primary"
-                tableHead={[
-                  "ID",
-                  "Reciever",
-                  "Type",
-                  "Description",
-                  "Sender",
-                  "Recipient",
-                  "Date",
-                ]}
-                tableData={[]}
               />
             </CardBody>
           </Card>

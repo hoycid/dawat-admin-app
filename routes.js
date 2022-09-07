@@ -39,13 +39,13 @@ const dashboardRoutes = [
 
     layout: "/admin",
   },
-  {
-    path: "/user-profile",
-    name: "User Profile",
-    icon: Person,
+  // {
+  //   path: "/user-profile",
+  //   name: "User Profile",
+  //   icon: Person,
 
-    layout: "/admin",
-  },
+  //   layout: "/admin",
+  // },
   // {
   //   path: "/employee-list",
   //   name: "Employee List",

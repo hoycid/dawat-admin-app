@@ -7,9 +7,12 @@ import {
   roseColor,
   grayColor,
   defaultFont,
+  whiteColor,
+  blackColor,
+  hexToRgb,
 } from "assets/jss/nextjs-material-dashboard.js";
 
-const tableStyle = (theme) => ({
+const tableStyle = theme => ({
   warningTableHeader: {
     color: warningColor[0],
   },
@@ -71,6 +74,27 @@ const tableStyle = (theme) => ({
     display: "table-row",
     outline: "none",
     verticalAlign: "middle",
+  },
+  tableClickableRow: {
+    height: "48px",
+    color: "inherit",
+    display: "table-row",
+    outline: "none",
+    verticalAlign: "middle",
+    willChange: "box-shadow, transform",
+    "&:hover,&:focus": {
+      cursor: "pointer",
+      color: whiteColor,
+      backgroundColor: dangerColor[1],
+      boxShadow:
+        "0 14px 26px -12px rgba(" +
+        hexToRgb(grayColor[0]) +
+        ", 0.42), 0 4px 23px 0px rgba(" +
+        hexToRgb(blackColor) +
+        ", 0.12), 0 8px 10px -5px rgba(" +
+        hexToRgb(grayColor[0]) +
+        ", 0.2)",
+    },
   },
 });
 

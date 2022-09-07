@@ -9,9 +9,9 @@ import NativeSelect from "@material-ui/core/NativeSelect";
 import FormControl from "@material-ui/core/FormControl";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import Chip from "@material-ui/core/Chip";
-import Modal from '@material-ui/core/Modal';
-import Backdrop from '@material-ui/core/Backdrop';
-import Fade from '@material-ui/core/Fade';
+import Modal from "@material-ui/core/Modal";
+import Backdrop from "@material-ui/core/Backdrop";
+import Fade from "@material-ui/core/Fade";
 import Icon from "@material-ui/core/Icon";
 
 // layout for this page
@@ -44,8 +44,6 @@ import DoneOutlineIcon from "@material-ui/icons/DoneOutline";
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
 
-import Image from 'next/image'
-
 import axios from "axios";
 import moment from "moment";
 
@@ -53,10 +51,10 @@ import defaultPhoto from "assets/img/default.jpg";
 
 const styles = {
   modal: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    boxShadow: 3
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    boxShadow: 3,
   },
   paper: {
     backgroundColor: "transparent",
@@ -66,9 +64,9 @@ const styles = {
   paragraphClickable: {
     fontSize: 12,
     color: "black",
-    '&:hover': {
+    "&:hover": {
       color: "#D1B8D6",
-    }
+    },
   },
   formControl: {
     minWidth: 120,
@@ -96,13 +94,19 @@ function Inbound() {
   const [documentTypes, setDocumentTypes] = React.useState([]);
 
   const [loadingData, setLoadingData] = React.useState(true);
-  const [loadingInboundsFailed, setLoadingInboundsFailed] = React.useState(false);
+  const [loadingInboundsFailed, setLoadingInboundsFailed] =
+    React.useState(false);
 
   const [openAttachModal, setOpenAttachModal] = React.useState(false);
 
   const [notificationSuccess, setNotificationSuccess] = React.useState(false);
   const [notificationFail, setNotificationFail] = React.useState(false);
-  const [notificationIncomplete, setNotificationIncomplete] = React.useState(false);
+  const [notificationUploadSuccess, setNotificationUploadSuccess] =
+    React.useState(false);
+  const [notificationUploadFail, setNotificationUploadFail] =
+    React.useState(false);
+  const [notificationIncomplete, setNotificationIncomplete] =
+    React.useState(false);
 
   const [selectedImage, setSelectedImage] = React.useState(null);
   const [uploadedFile, setUploadedFile] = React.useState("");
@@ -115,17 +119,25 @@ function Inbound() {
     date: moment().format(),
   });
 
+  const [receiver, setReceiver] = React.useState("user");
+
   React.useEffect(() => {
     getData();
 
+    const interval = setInterval(() => {
+      getData();
+    }, 15000);
+
     return function cleanup() {
+      clearInterval(interval);
+
       // to stop the warning of calling setState of unmounted component
       var id = window.setTimeout(null, 0);
       while (id--) {
         window.clearTimeout(id);
       }
     };
-  }, [loadingData]);
+  }, []);
 
   async function getData() {
     const getInboundFetchResponse = await fetch("/api/inbound", {
@@ -135,6 +147,14 @@ function Inbound() {
         "Content-Type": "application/json",
       },
     });
+
+    const getInboundResponse = await getInboundFetchResponse.json();
+    if (getInboundResponse.success) {
+      setInboundDocs(getInboundResponse.data);
+      setLoadingData(false);
+    } else {
+      showNotification("loadingInboundsFailed");
+    }
 
     const getDocumentTypesFetchResponse = await fetch("/api/types", {
       method: "GET",
@@ -148,23 +168,18 @@ function Inbound() {
     if (getDocumentTypesResponse.success) {
       setDocumentTypes(getDocumentTypesResponse.data);
     }
-
-    const getInboundResponse = await getInboundFetchResponse.json();
-    if (getInboundResponse.success) {
-      setInboundDocs(getInboundResponse.data);
-      setLoadingData(false);
-    } else {
-      showNotification("loadingInboundsFailed");
-    }
   }
 
-  async function handleSubmit(data) {
-    if (data.type && data.description) {
+  async function handleSubmit(details) {
+    if (details.type && details.sender) {
       document.body.classList.add("body-page-transition");
       ReactDOM.render(
         <PageChange path={"/admin/inbound-sent"} />,
         document.getElementById("page-transition")
       );
+
+      const data = { ...details, receiver: receiver };
+
       const response = await fetch("/api/inbound", {
         method: "POST",
         body: JSON.stringify(data),
@@ -193,7 +208,7 @@ function Inbound() {
       showNotification("incomplete");
     }
     handleCloseAttachModal();
-  };
+  }
 
   const handleOnChange = (name, value) => {
     setState({
@@ -210,7 +225,7 @@ function Inbound() {
     setOpenAttachModal(false);
   };
 
-  const showNotification = (type) => {
+  const showNotification = type => {
     switch (type) {
       case "success":
         if (!notificationSuccess) {
@@ -225,6 +240,22 @@ function Inbound() {
           setNotificationFail(true);
           setTimeout(function () {
             setNotificationFail(false);
+          }, 4000);
+        }
+        break;
+      case "upload-success":
+        if (!notificationSuccess) {
+          setNotificationUploadSuccess(true);
+          setTimeout(function () {
+            setNotificationUploadSuccess(false);
+          }, 4000);
+        }
+        break;
+      case "upload-failed":
+        if (!notificationFail) {
+          setNotificationUploadFail(true);
+          setTimeout(function () {
+            setNotificationUploadFail(false);
           }, 4000);
         }
         break;
@@ -254,29 +285,33 @@ function Inbound() {
       const form = new FormData();
 
       form.append("media", selectedImage);
-  
+
       // for (var [key, value] of form.entries()) {
       //   console.log(key, value);
       // }
-  
+
       // const response = await fetch("/api/upload", {
       //   method: "POST",
       //   body: form,
       // });
-  
+
       await axios(`/api/upload`, {
         method: "POST",
         data: form,
-        "content-type": "multipart/form-data"
-      }).then((res) => {
-        setUploadedFile(res.data.media.path.toString());
-        console.log(uploadedFile);
-      })
+        "content-type": "multipart/form-data",
+      }).then(res => {
+        if (res.status === 201) {
+          setUploadedFile(res.data.media.path.toString());
+          showNotification("upload-success");
+        } else {
+          showNotification("upload-failed");
+        }
+      });
     } else {
       showNotification("incomplete");
       handleCloseAttachModal();
     }
-  };
+  }
 
   const handleChooseFile = e => {
     setSelectedImage(e.target.files[0]);
@@ -304,7 +339,7 @@ function Inbound() {
                   <FormControl className={classes.formControl}>
                     <InputLabel>Type</InputLabel>
                     <NativeSelect
-                      onChange={(e) => {
+                      onChange={e => {
                         const { name, value } = e.target;
                         handleOnChange(name, value);
                       }}
@@ -344,7 +379,7 @@ function Inbound() {
                     inputProps={{
                       name: "sender",
                       value: state.sender,
-                      onChange: (e) => {
+                      onChange: e => {
                         const { name, value } = e.target;
                         handleOnChange(name, value);
                       },
@@ -370,7 +405,7 @@ function Inbound() {
                     inputProps={{
                       name: "description",
                       value: state.description,
-                      onChange: (e) => {
+                      onChange: e => {
                         const { name, value } = e.target;
                         handleOnChange(name, value);
                       },
@@ -389,7 +424,11 @@ function Inbound() {
             <CardFooter>
               <GridContainer>
                 <GridItem xs={12} sm={12} md={6}>
-                  <Button color="primary" onClick={handleOpenAttachModal}>
+                  <Button
+                    disabled={state.type && state.sender ? false : true}
+                    color="primary"
+                    onClick={handleOpenAttachModal}
+                  >
                     Attach file
                   </Button>
                 </GridItem>
@@ -455,12 +494,12 @@ function Inbound() {
             <CardBody>
               <Table
                 tableHeaderColor="danger"
-                tableHead={["Receiver", "Type", "Description", "Date"]}
-                tableData={inboundDocs.map((doc) => [
-                  "Cidrex",
+                tableHead={["Type", "Description", "Date", "Receiver"]}
+                tableData={inboundDocs.map(doc => [
                   doc.type,
                   doc.description,
                   moment(doc.date).format("MM/DD/YYYY, hh:mm A"),
+                  doc.receiver,
                 ])}
               />
             </CardBody>
@@ -475,6 +514,24 @@ function Inbound() {
               message="Inbound document has been saved successfully!"
               open={notificationSuccess}
               closeNotification={() => setNotificationSuccess(false)}
+              close
+            />
+            <Snackbar
+              place="br"
+              color="success"
+              icon={DoneOutlineIcon}
+              message="Image uploaded successfully!"
+              open={notificationUploadSuccess}
+              closeNotification={() => setNotificationUploadSuccess(false)}
+              close
+            />
+            <Snackbar
+              place="br"
+              color="danger"
+              icon={ErrorOutlineIcon}
+              message="Something went wrong. Image upload failed."
+              open={notificationUploadFail}
+              closeNotification={() => setNotificationUploadFail(false)}
               close
             />
             <Snackbar
@@ -526,9 +583,9 @@ function Inbound() {
                     </p>
                   </CardHeader>
                 </div>
-                <CardAvatar>
-                  <img src={state.img} alt="image" />
-                </CardAvatar>
+                {/* <CardAvatar>
+                  <img src={uploadedFile || state.img} alt="image" />
+                </CardAvatar> */}
                 <CardBody>
                   <input
                     type="file"
@@ -539,11 +596,14 @@ function Inbound() {
                   />
                   <Button
                     color="primary"
+                    disabled={selectedImage ? false : true}
                     onClick={() => {
-                      !uploadedFile ? handleUploadFile() : handleSubmit(state);
+                      // !uploadedFile ? handleUploadFile() : handleSubmit(state);
+                      handleSubmit(state);
                     }}
                   >
-                    {!uploadedFile ? "Upload" : "Submit"}
+                    {/* {!uploadedFile ? "Upload" : "Submit"} */}
+                    Submit
                   </Button>
                   <Button
                     color="primary"
